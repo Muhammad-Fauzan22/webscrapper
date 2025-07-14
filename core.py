@@ -1,90 +1,60 @@
-import os
-import asyncio
-import aiohttp
-import random
+"""Global configuration for Super AI Scraper"""
 from datetime import datetime
-from swarm.agents.meta_planner import MetaPlanner
-from swarm.agents.scraper import Scraper
-from swarm.storage.gdrive import DriveStorage
-from swarm.agents.healer import Healer
-from config import CONFIG, AI_CONFIG, SCALING_PROFILE, TIMESTAMP, USER
 
-class SuperSwarm:
-    def __init__(self):
-        self.storage = DriveStorage()
-        self.active_workers = CONFIG["workers"]
-        self.cycle_count = 0
-        
-    async def run_cycle(self):
-        """Main execution cycle for the swarm"""
-        print(f"\n=== CYCLE {self.cycle_count} ===")
-        print(f"Timestamp: {TIMESTAMP} | User: {USER}")
-        
-        try:
-            # 1. AI-Powered Planning Phase
-            plan = await MetaPlanner.generate_scrape_plan(
-                "renewable energy in ASEAN",
-                AI_CONFIG["CYPHER"]
-            )
-            
-            # 2. Parallel Execution Phase
-            async with aiohttp.ClientSession() as session:
-                tasks = [
-                    Scraper.execute(session, target, AI_CONFIG["DEEPSEEK"]) 
-                    for target in plan[:CONFIG["max_targets"]]
-                ]
-                results = await asyncio.gather(*tasks, return_exceptions=True)
-                
-                # 3. Intelligent Storage
-                success_count = await self.storage.save_batch(
-                    [r for r in results if not isinstance(r, Exception)]
-                )
-                
-            # 4. Auto-Healing Mechanism
-            if self.requires_healing(results):
-                await Healer.diagnose_and_fix(
-                    results,
-                    AI_CONFIG["CLAUDE"],
-                    AI_CONFIG["CYPHER"]
-                )
-                
-            # 5. Dynamic Scaling
-            self.adjust_workers()
-            
-            print(f"Cycle completed! Success rate: {success_count}/{len(tasks)}")
-            return True
-            
-        except Exception as e:
-            print(f"Critical error in swarm cycle: {str(e)}")
-            return False
-            
-    def requires_healing(self, results) -> bool:
-        """Determine if healing is needed based on error ratio"""
-        error_count = sum(1 for r in results if isinstance(r, Exception))
-        error_ratio = error_count / len(results) if results else 0
-        return error_ratio > ALERT_THRESHOLDS["healing_ratio"]
-        
-    def adjust_workers(self):
-        """Adjust worker count based on system load"""
-        # Placeholder for actual system monitoring
-        cpu_load = 65  # Simulated value
-        
-        if cpu_load > SCALING_PROFILE["scale_up_threshold"]:
-            new_workers = min(
-                self.active_workers * 2,
-                SCALING_PROFILE["max_workers"]
-            )
-            print(f"Scaling UP workers: {self.active_workers} → {new_workers}")
-            self.active_workers = new_workers
-            
-        elif cpu_load < SCALING_PROFILE["scale_down_threshold"]:
-            new_workers = max(
-                self.active_workers // 2,
-                SCALING_PROFILE["min_workers"]
-            )
-            print(f"Scaling DOWN workers: {self.active_workers} → {new_workers}")
-            self.active_workers = new_workers
+# Current timestamp and user
+TIMESTAMP = "2025-07-14 17:25:34"
+USER = "Muhammad-Fauzan22"
 
-if __name__ == "__main__":
-    swarm = SuperSwarm()
-    asyncio.run(swarm.run_cycle())
+# System configuration
+CONFIG = {
+    "max_retries": 3,
+    "batch_size": 1024 * 1024,  # 1MB
+    "timeout": 30,
+    "workers": 4,
+    "max_targets": 20
+}
+
+# AI Configuration
+AI_CONFIG = {
+    "DEEPSEEK": {
+        "endpoint": "https://api.deepseek.com/v1/chat/completions",
+        "model": "deepseek-chat",
+        "key": "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"
+    },
+    "CLAUDE": {
+        "endpoint": "https://api.anthropic.com/v1/messages",
+        "model": "claude-3-opus-20240229",
+        "key": "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"
+    },
+    "PERPLEXITY": {
+        "endpoint": "https://api.perplexity.ai/chat/completions",
+        "model": "pplx-70b-online",
+        "key": "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"
+    },
+    "CYPHER": {
+        "endpoint": "https://api.cypher.ai/v1/completions",
+        "model": "cypher-alpha",
+        "key": "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"
+    },
+    "GEMMA": {
+        "endpoint": "https://api.gemma.ai/v1/generate",
+        "model": "gemma-7b-it",
+        "key": "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"
+    }
+}
+
+# Alert thresholds
+ALERT_THRESHOLDS = {
+    "cpu_percent": 80,
+    "memory_percent": 85,
+    "disk_usage": 90,
+    "healing_ratio": 0.3
+}
+
+# Auto-scaling configuration
+SCALING_PROFILE = {
+    "min_workers": 2,
+    "max_workers": 8,
+    "scale_up_threshold": 70,  # CPU usage %
+    "scale_down_threshold": 30
+}
