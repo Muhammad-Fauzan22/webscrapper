@@ -1,140 +1,131 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-COST OPTIMIZATION ENGINE
-Version: 2.0.0
+ADVANCED COST OPTIMIZATION ENGINE
+Version: 3.0.0
 Created: 2025-07-17
 Author: Financial Efficiency Team
 """
 
 import os
-import logging
 import yaml
+import logging
 from datetime import datetime, timedelta
-from .logger import Logger
+from swarm.utils import Logger
 
 logger = Logger(name="CostOptimizer")
 
 class CostOptimizer:
     def __init__(self):
-        self.config_path = "configs/api_priority.yaml"
+        self.config_path = "configs/cost_config.yaml"
         self.cost_data = {}
         self.daily_budget = float(os.getenv("DAILY_BUDGET", 0.1))  # $0.1/day default
         self._load_config()
     
     def _load_config(self):
-        """Load API priority configuration"""
+        """Load cost optimization configuration"""
         try:
-            with open(self.config_path, 'r') as f:
-                self.config = yaml.safe_load(f)
-                logger.info("API priority config loaded")
+            if os.path.exists(self.config_path):
+                with open(self.config_path, 'r') as f:
+                    self.config = yaml.safe_load(f)
+                logger.info("Cost optimization config loaded")
+            else:
+                self.config = {
+                    "providers": {
+                        "primary": {"cost_per_token": 0.00002, "daily_limit": 5000},
+                        "fallback": {"cost_per_token": 0.00001, "daily_limit": 10000}
+                    },
+                    "auto_switch_threshold": 0.8  # Switch at 80% of budget
+                }
         except Exception as e:
-            logger.error(f"Failed to load config: {str(e)}")
-            self.config = {
-                "priority_chain": [
-                    {"name": "cypher", "cost_per_token": 0.00002},
-                    {"name": "deepseek", "cost_per_token": 0.000015},
-                    {"name": "claude", "cost_per_token": 0.000025},
-                    {"name": "huggingface", "cost_per_token": 0.0}
-                ]
-            }
+            logger.error(f"Config load failed: {str(e)}")
+            self.config = {}
     
     def track_usage(self, provider: str, tokens: int):
         """Track token usage and calculate cost"""
-        if not tokens:
+        if tokens <= 0:
             return
         
-        # Find provider cost
-        cost_per_token = next(
-            (p["cost_per_token"] for p in self.config["priority_chain"] 
-            if p["name"] == provider
-        ), 0.00002)  # Default if not found
-        
+        # Get provider cost config
+        provider_config = self.config["providers"].get(provider, {})
+        cost_per_token = provider_config.get("cost_per_token", 0.00002)
         cost = tokens * cost_per_token
         
         # Update daily tracking
         today = datetime.now().strftime("%Y-%m-%d")
         if today not in self.cost_data:
-            self.cost_data[today] = {}
+            self.cost_data[today] = {"total_cost": 0.0, "providers": {}}
         
-        if provider not in self.cost_data[today]:
-            self.cost_data[today][provider] = 0.0
+        if provider not in self.cost_data[today]["providers"]:
+            self.cost_data[today]["providers"][provider] = 0.0
         
-        self.cost_data[today][provider] += cost
+        self.cost_data[today]["providers"][provider] += cost
+        self.cost_data[today]["total_cost"] += cost
         
-        logger.info(
-            f"Tracked usage: {tokens} tokens on {provider} = ${cost:.6f}"
-        )
-        
-        # Check if we need to switch providers
-        if self.cost_data[today][provider] > self.daily_budget / 3:
-            self._activate_fallback(provider)
-    
-    def _activate_fallback(self, provider: str):
-        """Activate fallback for a provider"""
-        provider_config = next(
-            p for p in self.config["priority_chain"] 
-            if p["name"] == provider
-        )
-        
-        if "fallback" not in provider_config:
-            logger.warning(f"No fallback defined for {provider}")
-            return
-        
-        fallback = provider_config["fallback"]
-        logger.info(
-            f"Cost threshold exceeded for {provider}. Switching to {fallback}"
-        )
-        
-        # Update config priority
-        self.config["priority_chain"] = [
-            p for p in self.config["priority_chain"] 
-            if p["name"] != provider
-        ]
-        
-        # Add fallback to the end of the chain
-        self.config["priority_chain"].append(
-            next(
-                p for p in self.config["priority_chain"] 
-                if p["name"] == fallback
-            )
-        )
-        
-        # Save updated config
-        self._save_config()
-    
-    def _save_config(self):
-        """Save updated configuration"""
-        try:
-            with open(self.config_path, 'w') as f:
-                yaml.safe_dump(self.config, f)
-            logger.info("Updated API priority config saved")
-        except Exception as e:
-            logger.error(f"Failed to save config: {str(e)}")
-    
-    def get_current_provider(self, service_type: str) -> str:
-        """Get current preferred provider for a service type"""
-        # Simplified logic - in real implementation would map service types
-        return self.config["priority_chain"][0]["name"]
+        logger.info(f"Tracked usage: {tokens} tokens on {provider} = ${cost:.6f}")
     
     def get_daily_cost(self) -> float:
         """Get total cost for current day"""
         today = datetime.now().strftime("%Y-%m-%d")
-        return sum(self.cost_data.get(today, {}).values())
+        return self.cost_data.get(today, {}).get("total_cost", 0.0)
     
-    def get_provider_cost(self, provider: str) -> float:
-        """Get cost for a specific provider today"""
-        today = datetime.now().strftime("%Y-%m-%d")
-        return self.cost_data.get(today, {}).get(provider, 0.0)
+    def get_remaining_budget(self) -> float:
+        """Get remaining daily budget"""
+        return self.daily_budget - self.get_daily_cost()
     
-    def get_cost_report(self) -> dict:
-        """Generate comprehensive cost report"""
+    def should_switch(self, provider: str) -> bool:
+        """Determine if should switch from current provider"""
         today = datetime.now().strftime("%Y-%m-%d")
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        provider_cost = self.cost_data.get(today, {}).get("providers", {}).get(provider, 0.0)
         
-        return {
-            "today": self.cost_data.get(today, {}),
-            "yesterday": self.cost_data.get(yesterday, {}),
-            "daily_budget": self.daily_budget,
-            "remaining_budget": self.daily_budget - self.get_daily_cost()
-        }
+        # Check if exceeded provider-specific limit
+        provider_limit = self.config["providers"].get(provider, {}).get("daily_limit", float('inf'))
+        if provider_cost > provider_limit:
+            return True
+        
+        # Check if approaching total budget
+        total_cost = self.get_daily_cost()
+        if total_cost > self.daily_budget * self.config.get("auto_switch_threshold", 0.8):
+            return True
+        
+        return False
+    
+    def get_cost_report(self, period: str = "daily") -> dict:
+        """Generate cost report"""
+        report = {}
+        
+        if period == "daily":
+            today = datetime.now().strftime("%Y-%m-%d")
+            yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            
+            report = {
+                "today": self.cost_data.get(today, {}),
+                "yesterday": self.cost_data.get(yesterday, {}),
+                "budget": self.daily_budget,
+                "remaining": self.daily_budget - self.get_daily_cost()
+            }
+        elif period == "weekly":
+            # Implement weekly aggregation
+            pass
+        
+        return report
+    
+    def optimize_api_calls(self, plan: dict) -> dict:
+        """Optimize API call plan based on cost"""
+        optimized_plan = {}
+        provider_limits = self.config["providers"]
+        
+        for service, requests in plan.items():
+            provider = requests["provider"]
+            max_requests = provider_limits[provider].get("daily_limit", 1000)
+            
+            # Apply limit
+            optimized_requests = requests["count"] if requests["count"] < max_requests else max_requests
+            optimized_plan[service] = {
+                "provider": provider,
+                "optimized_count": optimized_requests,
+                "cost_savings": (requests["count"] - optimized_requests) * 
+                                provider_limits[provider]["cost_per_token"]
+            }
+        
+        return optimized_plan
