@@ -1,216 +1,150 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SELF-HEALING AGENT
-Version: 2.0.8
-Created: 2025-07-15
+ADVANCED SELF-HEALING AGENT
+Version: 3.0.0
+Created: 2025-07-17
 Author: System Resilience Team
 """
 
-import aiohttp
-import json
+import asyncio
 import logging
-import re
-import os
+import random
+from datetime import datetime
+from .base_agent import BaseAgent
+from swarm.utils import RetryHandler
 
-logger = logging.getLogger("HealerAgent")
+logger = logging.getLogger("Healer")
 
-class Healer:
-    def __init__(self, config_path="healing_strategies.json"):
-        self.strategies = self._load_strategies(config_path)
+class Healer(BaseAgent):
+    def __init__(self, primary_config, fallback_config, cost_optimizer):
+        super().__init__(primary_config, fallback_config, cost_optimizer)
+        self.error_history = []
+        self.last_healing = datetime.now()
+        self.healing_strategies = self._load_healing_strategies()
         
-    async def diagnose(self, failures: list, claude_config: dict, cypher_config: dict) -> dict:
-        """Diagnose system failures and generate solutions"""
-        # Step 1: Classify failures
-        failure_summary = await self._classify_failures(failures, claude_config)
+    async def diagnose_and_heal(self, error: Exception) -> dict:
+        """Diagnose and heal system errors"""
+        error_type = type(error).__name__
+        error_msg = str(error)
+        logger.warning(f"Diagnosing error: {error_type} - {error_msg}")
         
-        # Step 2: Generate solutions
-        solutions = await self._generate_solutions(failure_summary, cypher_config)
+        # Record error
+        self.error_history.append({
+            "timestamp": datetime.now(),
+            "type": error_type,
+            "message": error_msg
+        })
         
-        # Step 3: Match with known strategies
-        matched_solutions = []
-        for solution in solutions:
-            matched = self._match_known_strategy(solution)
-            if matched:
-                matched_solutions.append(matched)
-            else:
-                matched_solutions.append({
-                    "type": "NEW_SOLUTION",
-                    "description": solution,
-                    "confidence": 0.7
-                })
-                
+        # Analyze error pattern
+        analysis = await self._analyze_errors()
+        
+        # Select and apply healing strategy
+        strategy = self._select_strategy(analysis)
+        result = await self._apply_healing(strategy)
+        
         return {
-            "failure_summary": failure_summary,
-            "solutions": matched_solutions
+            "error_type": error_type,
+            "strategy": strategy,
+            "result": result,
+            "analysis": analysis
         }
     
-    async def apply_solutions(self, solutions: list):
-        """Apply healing solutions to the system"""
-        for solution in solutions:
-            try:
-                if solution['type'] == "CONFIG_UPDATE":
-                    self._apply_config_update(solution['details'])
-                elif solution['type'] == "CODE_PATCH":
-                    self._apply_code_patch(solution['details'])
-                elif solution['type'] == "RESOURCE_ADJUSTMENT":
-                    self._apply_resource_adjustment(solution['details'])
-                elif solution['type'] == "RETRY_STRATEGY":
-                    self._apply_retry_strategy(solution['details'])
-                elif solution['type'] == "FALLBACK_ACTIVATION":
-                    self._activate_fallback(solution['details'])
-                    
-                logger.info(f"Applied solution: {solution['type']}")
-            except Exception as e:
-                logger.error(f"Solution application failed: {str(e)}")
+    async def _analyze_errors(self) -> dict:
+        """Analyze error patterns"""
+        # Simple frequency analysis
+        error_counts = {}
+        for error in self.error_history:
+            error_type = error["type"]
+            error_counts[error_type] = error_counts.get(error_type, 0) + 1
+        
+        # Time-based analysis (errors in last hour)
+        recent_errors = [e for e in self.error_history 
+                        if (datetime.now() - e["timestamp"]).seconds < 3600]
+        
+        return {
+            "total_errors": len(self.error_history),
+            "error_counts": error_counts,
+            "recent_errors": len(recent_errors),
+            "most_common": max(error_counts, key=error_counts.get) if error_counts else None
+        }
     
-    async def _classify_failures(self, failures: list, api_config: dict) -> str:
-        """Classify failures using AI"""
-        failure_samples = "\n".join([str(f)[:500] for f in failures[:5]])
+    def _select_strategy(self, analysis: dict) -> str:
+        """Select appropriate healing strategy"""
+        # Rate limit errors
+        if "RateLimit" in analysis.get("most_common", ""):
+            return "rotate_provider"
         
-        prompt = f"""
-        Classify these system failures and provide a diagnostic summary:
+        # Connection errors
+        if "Connection" in analysis.get("most_common", ""):
+            return "reset_connection"
         
-        Failures:
-        {failure_samples}
+        # High frequency of recent errors
+        if analysis["recent_errors"] > 10:
+            return "restart_component"
         
-        Classification instructions:
-        1. Identify failure patterns
-        2. Categorize by system component
-        3. Determine root cause likelihood
-        4. Assess severity (1-5)
-        5. Output format:
-            {{
-                "patterns": ["list", "of", "patterns"],
-                "categories": ["component", "names"],
-                "root_cause_analysis": "text",
-                "severity": integer
-            }}
-        """
-        
-        async with aiohttp.ClientSession() as session:
-            payload = {
-                "model": api_config["model"],
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": 500,
-                "temperature": 0.2,
-                "response_format": {"type": "json_object"}
-            }
-            
-            headers = {
-                "Authorization": f"Bearer {api_config['key']}",
-                "Content-Type": "application/json"
-            }
-            
-            async with session.post(
-                api_config["endpoint"],
-                json=payload,
-                headers=headers,
-                timeout=30
-            ) as response:
-                data = await response.json()
-                return data["choices"][0]["message"]["content"]
+        # Default strategy
+        return "retry_with_backoff"
     
-    async def _generate_solutions(self, diagnosis: str, api_config: dict) -> list:
-        """Generate technical solutions using AI"""
-        prompt = f"""
-        Based on this system diagnosis, provide technical solutions:
+    async def _apply_healing(self, strategy: str) -> dict:
+        """Apply selected healing strategy"""
+        logger.info(f"Applying healing strategy: {strategy}")
         
-        {diagnosis}
-        
-        Solution requirements:
-        1. Provide 3-5 specific solutions
-        2. Each solution should include:
-           - Implementation steps
-           - Expected impact
-           - Risk assessment
-        3. Prioritize solutions by effectiveness
-        4. Output format: JSON array of solution objects
-        """
-        
-        async with aiohttp.ClientSession() as session:
-            payload = {
-                "model": api_config["model"],
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": 1000,
-                "temperature": 0.3,
-                "response_format": {"type": "json_object"}
-            }
-            
-            headers = {
-                "Authorization": f"Bearer {api_config['key']}",
-                "Content-Type": "application/json"
-            }
-            
-            async with session.post(
-                api_config["endpoint"],
-                json=payload,
-                headers=headers,
-                timeout=45
-            ) as response:
-                data = await response.json()
-                return json.loads(data["choices"][0]["message"]["content"])["solutions"]
-    
-    def _load_strategies(self, path: str) -> dict:
-        """Load known healing strategies from file"""
         try:
-            if os.path.exists(path):
-                with open(path) as f:
-                    return json.load(f)
-            return {}
-        except:
-            return {}
+            if strategy == "rotate_provider":
+                return await self._rotate_provider()
+            elif strategy == "reset_connection":
+                return await self._reset_connections()
+            elif strategy == "restart_component":
+                return await self._restart_component()
+            elif strategy == "fallback_mode":
+                return await self._activate_fallback()
+            else:  # retry_with_backoff
+                return {"action": "wait", "duration": random.randint(5, 30)}
+        except Exception as e:
+            logger.error(f"Healing failed: {str(e)}")
+            return {"status": "error", "error": str(e)}
     
-    def _match_known_strategy(self, solution: str) -> dict:
-        """Match solution to known healing strategies"""
-        # Simplified matching logic - in practice would use NLP matching
-        solution_lower = solution.lower()
+    async def _rotate_provider(self) -> dict:
+        """Rotate to fallback API provider"""
+        logger.info("Rotating API provider")
+        self.switch_to_fallback()
+        return {"status": "success", "action": "provider_rotation"}
+    
+    async def _reset_connections(self) -> dict:
+        """Reset all network connections"""
+        logger.info("Resetting network connections")
+        # Reset database connections
+        from swarm.storage import MongoDBManager
+        db = MongoDBManager()
+        await db.reconnect()
         
-        if "timeout" in solution_lower:
-            return self.strategies.get("timeout_adjustment", {
-                "type": "CONFIG_UPDATE",
-                "description": "Increase timeout thresholds",
-                "parameters": {"timeout": "increase"},
-                "confidence": 0.9
-            })
-        elif "memory" in solution_lower:
-            return self.strategies.get("memory_optimization", {
-                "type": "RESOURCE_ADJUSTMENT",
-                "description": "Optimize memory usage",
-                "parameters": {"memory_limit": "increase"},
-                "confidence": 0.85
-            })
-        elif "retry" in solution_lower:
-            return self.strategies.get("retry_strategy", {
-                "type": "RETRY_STRATEGY",
-                "description": "Implement exponential backoff",
-                "parameters": {"max_retries": 3, "backoff_factor": 2},
-                "confidence": 0.8
-            })
+        # Reset other connections
+        return {"status": "success", "action": "connection_reset"}
+    
+    async def _restart_component(self) -> dict:
+        """Restart a system component"""
+        logger.warning("Restarting system component")
+        # Select random component to restart (in real system would be more intelligent)
+        components = ["scraper", "cleaner", "planner"]
+        component = random.choice(components)
         
-        return None
+        # Simulate restart
+        return {"status": "success", "action": "component_restart", "component": component}
     
-    def _apply_config_update(self, details: dict):
-        """Apply configuration update strategy"""
-        # Implementation would modify configuration files
-        logger.info(f"Applying config update: {details}")
+    async def _activate_fallback(self) -> dict:
+        """Activate fallback mode"""
+        logger.critical("Activating fallback mode")
+        # Implement fallback logic
+        return {"status": "activated", "mode": "degraded_performance"}
     
-    def _apply_code_patch(self, details: dict):
-        """Apply code patch strategy"""
-        # Implementation would modify source code
-        logger.info(f"Applying code patch: {details}")
-    
-    def _apply_resource_adjustment(self, details: dict):
-        """Apply resource adjustment strategy"""
-        # Implementation would adjust resource allocation
-        logger.info(f"Applying resource adjustment: {details}")
-    
-    def _apply_retry_strategy(self, details: dict):
-        """Apply retry strategy"""
-        # Implementation would update retry logic
-        logger.info(f"Applying retry strategy: {details}")
-    
-    def _activate_fallback(self, details: dict):
-        """Activate fallback mechanism"""
-        # Implementation would enable fallback systems
-        logger.info(f"Activating fallback: {details}")
+    def _load_healing_strategies(self) -> dict:
+        """Load healing strategies from config"""
+        # In real implementation, load from YAML/JSON
+        return {
+            "rate_limit": "rotate_provider",
+            "connection_error": "reset_connection",
+            "timeout": "retry_with_backoff",
+            "high_failure_rate": "restart_component",
+            "critical_failure": "fallback_mode"
+        }
