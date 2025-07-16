@@ -1,172 +1,140 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-GOOGLE DRIVE STORAGE MODULE
-Version: 3.0.4
-Created: 2025-07-15
-Author: Cloud Storage Team
+COST OPTIMIZATION ENGINE
+Version: 2.0.0
+Created: 2025-07-17
+Author: Financial Efficiency Team
 """
 
 import os
-import json
-import gzip
-import hashlib
-import base64
 import logging
-from datetime import datetime
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaInMemoryUpload
-from googleapiclient.errors import HttpError
+import yaml
+from datetime import datetime, timedelta
+from .logger import Logger
 
-logger = logging.getLogger("DriveStorage")
+logger = Logger(name="CostOptimizer")
 
-class DriveStorage:
-    def __init__(self, chunk_size=5*1024*1024):  # 5MB chunks
-        self.service = self._initialize_service()
-        self.chunk_size = chunk_size
-        self.folder_cache = {}
-        
-    def _initialize_service(self):
-        """Initialize Google Drive service with robust error handling"""
+class CostOptimizer:
+    def __init__(self):
+        self.config_path = "configs/api_priority.yaml"
+        self.cost_data = {}
+        self.daily_budget = float(os.getenv("DAILY_BUDGET", 0.1))  # $0.1/day default
+        self._load_config()
+    
+    def _load_config(self):
+        """Load API priority configuration"""
         try:
-            # Load credentials from environment or file
-            if os.getenv('GOOGLE_CREDS_JSON'):
-                creds_info = json.loads(os.getenv('GOOGLE_CREDS_JSON'))
-            elif os.path.exists('service_account.json'):
-                with open('service_account.json') as f:
-                    creds_info = json.load(f)
-            else:
-                raise RuntimeError("Google credentials not found")
-            
-            credentials = service_account.Credentials.from_service_account_info(
-                creds_info,
-                scopes=['https://www.googleapis.com/auth/drive']
-            )
-            
-            return build('drive', 'v3', credentials=credentials, cache_discovery=False)
+            with open(self.config_path, 'r') as f:
+                self.config = yaml.safe_load(f)
+                logger.info("API priority config loaded")
         except Exception as e:
-            logger.critical(f"Drive service initialization failed: {str(e)}")
-            raise
-
-    async def save_batch(self, data: list) -> int:
-        """Save data batch to Google Drive with advanced features"""
-        if not data:
-            return 0
-            
-        try:
-            # Create daily folder structure
-            folder_id = await self._get_today_folder()
-            
-            # Process and compress data
-            serialized = json.dumps(data, ensure_ascii=False)
-            compressed = gzip.compress(serialized.encode('utf-8'))
-            content_hash = hashlib.sha256(compressed).hexdigest()
-            
-            # Check for duplicates
-            if await self._is_duplicate(content_hash, folder_id):
-                logger.info("Duplicate content detected, skipping upload")
-                return 0
-                
-            # Upload file
-            file_name = f"scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{content_hash[:8]}.json.gz"
-            await self._upload_file(file_name, compressed, content_hash, folder_id)
-            
-            return len(data)
-        except Exception as e:
-            logger.error(f"Batch save failed: {str(e)}")
-            return 0
-
-    async def _get_today_folder(self) -> str:
-        """Get or create daily folder with retry logic"""
-        today = datetime.now().strftime("%Y-%m-%d")
-        
-        if today in self.folder_cache:
-            return self.folder_cache[today]
-            
-        try:
-            # Check if folder exists
-            query = f"name='{today}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
-            results = self.service.files().list(q=query, fields="files(id)").execute()
-            folders = results.get('files', [])
-            
-            if folders:
-                folder_id = folders[0]['id']
-            else:
-                # Create new folder
-                folder_metadata = {
-                    'name': today,
-                    'mimeType': 'application/vnd.google-apps.folder',
-                    'parents': [os.getenv('GOOGLE_DRIVE_FOLDER_ID')]
-                }
-                folder = self.service.files().create(body=folder_metadata, fields='id').execute()
-                folder_id = folder['id']
-                
-            self.folder_cache[today] = folder_id
-            return folder_id
-        except HttpError as e:
-            logger.error(f"Folder creation failed: {e.error_details}")
-            raise
-        except Exception as e:
-            logger.error(f"Folder operation failed: {str(e)}")
-            raise
-
-    async def _upload_file(self, file_name: str, content: bytes, content_hash: str, parent_id: str):
-        """Upload file with chunked resumable upload"""
-        try:
-            file_metadata = {
-                'name': file_name,
-                'parents': [parent_id],
-                'description': 'Scraped data archive',
-                'properties': {
-                    'content_hash': content_hash,
-                    'compression': 'gzip',
-                    'original_size': str(len(content)),
-                    'created': datetime.now().isoformat()
-                }
+            logger.error(f"Failed to load config: {str(e)}")
+            self.config = {
+                "priority_chain": [
+                    {"name": "cypher", "cost_per_token": 0.00002},
+                    {"name": "deepseek", "cost_per_token": 0.000015},
+                    {"name": "claude", "cost_per_token": 0.000025},
+                    {"name": "huggingface", "cost_per_token": 0.0}
+                ]
             }
-            
-            media = MediaInMemoryUpload(content, mimetype='application/gzip')
-            request = self.service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields='id'
+    
+    def track_usage(self, provider: str, tokens: int):
+        """Track token usage and calculate cost"""
+        if not tokens:
+            return
+        
+        # Find provider cost
+        cost_per_token = next(
+            (p["cost_per_token"] for p in self.config["priority_chain"] 
+            if p["name"] == provider
+        ), 0.00002)  # Default if not found
+        
+        cost = tokens * cost_per_token
+        
+        # Update daily tracking
+        today = datetime.now().strftime("%Y-%m-%d")
+        if today not in self.cost_data:
+            self.cost_data[today] = {}
+        
+        if provider not in self.cost_data[today]:
+            self.cost_data[today][provider] = 0.0
+        
+        self.cost_data[today][provider] += cost
+        
+        logger.info(
+            f"Tracked usage: {tokens} tokens on {provider} = ${cost:.6f}"
+        )
+        
+        # Check if we need to switch providers
+        if self.cost_data[today][provider] > self.daily_budget / 3:
+            self._activate_fallback(provider)
+    
+    def _activate_fallback(self, provider: str):
+        """Activate fallback for a provider"""
+        provider_config = next(
+            p for p in self.config["priority_chain"] 
+            if p["name"] == provider
+        )
+        
+        if "fallback" not in provider_config:
+            logger.warning(f"No fallback defined for {provider}")
+            return
+        
+        fallback = provider_config["fallback"]
+        logger.info(
+            f"Cost threshold exceeded for {provider}. Switching to {fallback}"
+        )
+        
+        # Update config priority
+        self.config["priority_chain"] = [
+            p for p in self.config["priority_chain"] 
+            if p["name"] != provider
+        ]
+        
+        # Add fallback to the end of the chain
+        self.config["priority_chain"].append(
+            next(
+                p for p in self.config["priority_chain"] 
+                if p["name"] == fallback
             )
-            
-            # Execute with exponential backoff
-            response = None
-            for attempt in range(3):
-                try:
-                    response = request.execute()
-                    break
-                except HttpError as e:
-                    if e.resp.status in [500, 502, 503, 504]:
-                        sleep_time = 2 ** attempt
-                        logger.warning(f"Retryable error, retrying in {sleep_time}s...")
-                        time.sleep(sleep_time)
-                    else:
-                        raise
-            
-            if not response:
-                raise RuntimeError("Upload failed after retries")
-                
-            logger.info(f"Uploaded file ID: {response.get('id')}")
-            return response.get('id')
-        except Exception as e:
-            logger.error(f"File upload failed: {str(e)}")
-            raise
-
-    async def _is_duplicate(self, content_hash: str, parent_id: str) -> bool:
-        """Check for duplicate content using content hash"""
+        )
+        
+        # Save updated config
+        self._save_config()
+    
+    def _save_config(self):
+        """Save updated configuration"""
         try:
-            query = f"'{parent_id}' in parents and properties has {{ key='content_hash' and value='{content_hash}' }} and trashed=false"
-            results = self.service.files().list(q=query, fields="files(id)").execute()
-            return bool(results.get('files', []))
+            with open(self.config_path, 'w') as f:
+                yaml.safe_dump(self.config, f)
+            logger.info("Updated API priority config saved")
         except Exception as e:
-            logger.error(f"Duplicate check failed: {str(e)}")
-            return False
-
-    async def close(self):
-        """Clean up resources"""
-        self.folder_cache.clear()
-        logger.info("Drive storage connection closed")
+            logger.error(f"Failed to save config: {str(e)}")
+    
+    def get_current_provider(self, service_type: str) -> str:
+        """Get current preferred provider for a service type"""
+        # Simplified logic - in real implementation would map service types
+        return self.config["priority_chain"][0]["name"]
+    
+    def get_daily_cost(self) -> float:
+        """Get total cost for current day"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        return sum(self.cost_data.get(today, {}).values())
+    
+    def get_provider_cost(self, provider: str) -> float:
+        """Get cost for a specific provider today"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        return self.cost_data.get(today, {}).get(provider, 0.0)
+    
+    def get_cost_report(self) -> dict:
+        """Generate comprehensive cost report"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        
+        return {
+            "today": self.cost_data.get(today, {}),
+            "yesterday": self.cost_data.get(yesterday, {}),
+            "daily_budget": self.daily_budget,
+            "remaining_budget": self.daily_budget - self.get_daily_cost()
+        }
