@@ -1,483 +1,363 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-CORE SYSTEM - Autonomous Web Scraping Orchestrator
-Version: 1.5.2
-Created: 2025-07-15
-Author: AI Master Programmer
+SWARM ORCHESTRATOR CORE
+Version: 3.0.0
+Created: 2025-07-17
+Author: Muhammad-Fauzan22
 """
 
-import os
 import asyncio
-import aiohttp
-import json
-import logging
-import platform
-import psutil
+import os
 import time
+import logging
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-
-# Custom module imports
-from swarm.agents.meta_planner import MetaPlanner
-from swarm.agents.scraper import Scraper
-from swarm.agents.healer import Healer
-from swarm.agents.cleaner import DataCleaner
-from swarm.storage.gdrive import DriveStorage
-from swarm.storage.mongodb import MongoDBStorage
-from swarm.util.performance import SystemMonitor
-
-# Configure advanced logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s | %(levelname)-8s | %(name)-16s | %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+from dotenv import load_dotenv
+from .agents import (
+    MetaPlanner,
+    Researcher,
+    Scraper,
+    DataCleaner,
+    Healer,
+    ModelTrainer,
+    ModelEvaluator
 )
-logger = logging.getLogger("SwarmCore")
-logger.setLevel(logging.DEBUG if os.getenv("DEBUG_MODE") == "1" else logging.INFO)
+from .storage import MongoDBManager, GoogleDriveManager, HFCacheManager
+from .utils import Logger, RetryHandler, SecretManager, CostOptimizer
+from .cloud import AutoScaler
 
-# Load AI configuration
-def load_ai_config() -> Dict[str, Any]:
-    """Load AI configuration with error handling and validation"""
-    try:
-        config_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), 
-            '..', 
-            'configs', 
-            'ai_config.yaml'
+# Initialize logger
+logger = Logger(name="Orchestrator")
+
+class Orchestrator:
+    def __init__(self, topic="ASEAN Renewable Energy"):
+        load_dotenv()  # Load environment variables
+        
+        # Initialize components
+        self.topic = topic
+        self.secret_manager = SecretManager()
+        self.cost_optimizer = CostOptimizer()
+        self.auto_scaler = AutoScaler()
+        self.healer = Healer()
+        
+        # Initialize agents with token optimization
+        self.meta_planner = self._init_agent(MetaPlanner, "CYPHER", "HF")
+        self.researcher = self._init_agent(Researcher, "PERPLEXITY", "SERPAPI")
+        self.scraper = self._init_agent(Scraper, "DEEPSEEK", "SCRAPEOPS")
+        self.cleaner = self._init_agent(DataCleaner, "CLAUDE", "HF")
+        self.trainer = self._init_agent(ModelTrainer, "GEMMA", "HF")
+        
+        # Initialize storage
+        self.db = MongoDBManager()
+        self.gdrive = GoogleDriveManager()
+        self.hf_cache = HFCacheManager()
+        
+        # State management
+        self.last_successful_run = None
+        self.error_count = 0
+        self.total_tokens_used = 0
+        self.token_budget = int(os.getenv("TOKEN_BUDGET", 100000))  # Default 100K tokens/day
+        
+    def _init_agent(self, agent_class, primary_provider, fallback_provider):
+        """Initialize agent with fallback strategy"""
+        primary_config = self._get_provider_config(primary_provider)
+        fallback_config = self._get_provider_config(fallback_provider)
+        
+        return agent_class(
+            primary_config=primary_config,
+            fallback_config=fallback_config,
+            cost_optimizer=self.cost_optimizer
+        )
+    
+    def _get_provider_config(self, provider):
+        """Get provider configuration with decrypted keys"""
+        provider = provider.upper()
+        return {
+            "endpoint": os.getenv(f"{provider}_ENDPOINT"),
+            "model": os.getenv(f"{provider}_MODEL"),
+            "key": self.secret_manager.decrypt(os.getenv(f"{provider}_KEY"))
+        }
+    
+    async def run(self):
+        """Main execution loop"""
+        logger.info(f"Starting Swarm Orchestrator for topic: {self.topic}")
+        
+        while True:
+            try:
+                # Check token budget before starting
+                if self.total_tokens_used >= self.token_budget:
+                    logger.warning("Token budget exhausted. Pausing until reset.")
+                    await asyncio.sleep(3600)  # Sleep for 1 hour
+                    self.total_tokens_used = 0  # Reset counter
+                    continue
+                
+                start_time = time.time()
+                
+                # Execute scraping pipeline
+                await self.execute_pipeline()
+                
+                # Run periodic tasks
+                await self.run_periodic_tasks()
+                
+                # Update successful run timestamp
+                self.last_successful_run = datetime.now()
+                self.error_count = 0
+                
+                duration = time.time() - start_time
+                logger.info(f"Cycle completed in {duration:.2f} seconds. Tokens used: {self.total_tokens_used}/{self.token_budget}")
+                
+                # Sleep until next cycle (default 6 hours)
+                await asyncio.sleep(21600)
+                
+            except Exception as e:
+                self.error_count += 1
+                logger.error(f"Critical error in main loop: {str(e)}")
+                await self.handle_critical_error(e)
+    
+    async def execute_pipeline(self):
+        """Execute the full scraping pipeline"""
+        # Step 1: Planning
+        plan_result = await self.execute_with_retry(
+            self.meta_planner.generate_scrape_plan,
+            self.topic
+        )
+        self._update_token_usage(plan_result.get("tokens", 0))
+        
+        # Step 2: Research
+        research_result = await self.execute_with_retry(
+            self.researcher.research_topic,
+            self.topic
+        )
+        self._update_token_usage(research_result.get("tokens", 0))
+        
+        # Step 3: Scraping
+        scrape_results = []
+        for url in plan_result["targets"]:
+            result = await self.execute_with_retry(
+                self.scraper.scrape_url,
+                url
+            )
+            scrape_results.append(result)
+            self._update_token_usage(result.get("tokens", 0))
+        
+        # Step 4: Cleaning
+        cleaned_data = []
+        for data in scrape_results:
+            result = await self.execute_with_retry(
+                self.cleaner.clean,
+                data["content"]
+            )
+            cleaned_data.append(result)
+            self._update_token_usage(result.get("tokens", 0))
+        
+        # Step 5: Storage
+        storage_result = await self.execute_with_retry(
+            self.store_results,
+            cleaned_data
         )
         
-        if not os.path.exists(config_path):
-            raise FileNotFoundError(f"AI config not found at {config_path}")
-        
-        with open(config_path) as f:
-            import yaml
-            config = yaml.safe_load(f)
-            
-            # Validate essential keys
-            required_services = ["DEEPSEEK", "CLAUDE", "PERPLEXITY", "CYPHER"]
-            for service in required_services:
-                if service not in config:
-                    raise ValueError(f"Missing {service} configuration")
-                if "key" not in config[service] or not config[service]["key"]:
-                    raise ValueError(f"Invalid API key for {service}")
-            
-            return config
-    except Exception as e:
-        logger.critical(f"AI config load failed: {str(e)}")
-        # Attempt to load from environment as fallback
         return {
-            "DEEPSEEK": {
-                "endpoint": os.getenv("DEEPSEEK_ENDPOINT"),
-                "model": os.getenv("DEEPSEEK_MODEL"),
-                "key": os.getenv("DEEPSEEK_KEY")
-            },
-            "CLAUDE": {
-                "endpoint": os.getenv("CLAUDE_ENDPOINT"),
-                "model": os.getenv("CLAUDE_MODEL"),
-                "key": os.getenv("CLAUDE_KEY")
-            },
-            "PERPLEXITY": {
-                "endpoint": os.getenv("PERPLEXITY_ENDPOINT"),
-                "model": os.getenv("PERPLEXITY_MODEL"),
-                "key": os.getenv("PERPLEXITY_KEY")
-            },
-            "CYPHER": {
-                "endpoint": os.getenv("CYPHER_ENDPOINT"),
-                "model": os.getenv("CYPHER_MODEL"),
-                "key": os.getenv("CYPHER_KEY")
+            "plan": plan_result,
+            "research": research_result,
+            "scrape": scrape_results,
+            "cleaned": cleaned_data,
+            "storage": storage_result
+        }
+    
+    async def execute_with_retry(self, func, *args, **kwargs):
+        """Execute function with smart retry mechanism"""
+        retry_handler = RetryHandler(
+            max_retries=3,
+            backoff_factor=2,
+            cost_optimizer=self.cost_optimizer
+        )
+        
+        return await retry_handler.execute(
+            func, 
+            *args, 
+            **kwargs,
+            token_budget_remaining=self.token_budget - self.total_tokens_used
+        )
+    
+    async def run_periodic_tasks(self):
+        """Execute periodic maintenance tasks"""
+        now = datetime.now()
+        
+        # Daily tasks (run once per day)
+        if not self.last_successful_run or (now - self.last_successful_run) >= timedelta(days=1):
+            logger.info("Running daily tasks")
+            await self.backup_data()
+            await self.cleanup_cache()
+            
+            # Weekly tasks (run on Sundays)
+            if now.weekday() == 6:  # Sunday
+                logger.info("Running weekly tasks")
+                await self.train_model()
+                await self.evaluate_model()
+    
+    async def backup_data(self):
+        """Backup data to Google Drive"""
+        logger.info("Starting data backup to Google Drive")
+        try:
+            await self.gdrive.backup_database(
+                db_manager=self.db,
+                folder_id=os.getenv("GOOGLE_DRIVE_FOLDER_ID")
+            )
+            logger.info("Data backup completed successfully")
+        except Exception as e:
+            logger.error(f"Backup failed: {str(e)}")
+    
+    async def cleanup_cache(self):
+        """Clean up cache storage"""
+        logger.info("Cleaning up cache")
+        try:
+            await self.hf_cache.cleanup(
+                max_age_days=7,
+                max_size_gb=1
+            )
+            logger.info("Cache cleanup completed")
+        except Exception as e:
+            logger.error(f"Cache cleanup failed: {str(e)}")
+    
+    async def train_model(self):
+        """Train and update model"""
+        logger.info("Starting model training")
+        try:
+            # Get recent data for training
+            training_data = await self.db.get_recent_data(
+                collection=self.topic,
+                days=30
+            )
+            
+            # Train model
+            training_result = await self.trainer.train(
+                dataset=training_data,
+                token_budget=self.token_budget - self.total_tokens_used
+            )
+            self._update_token_usage(training_result.get("tokens", 0))
+            
+            logger.info(f"Model training completed: {training_result['model_id']}")
+            return training_result
+        except Exception as e:
+            logger.error(f"Model training failed: {str(e)}")
+            return None
+    
+    async def evaluate_model(self):
+        """Evaluate model performance"""
+        logger.info("Evaluating model performance")
+        try:
+            # Get validation data
+            validation_data = await self.db.get_validation_data(
+                collection=self.topic,
+                sample_size=100
+            )
+            
+            # Evaluate model
+            evaluation_result = await self.trainer.evaluate(
+                dataset=validation_data,
+                token_budget=self.token_budget - self.total_tokens_used
+            )
+            self._update_token_usage(evaluation_result.get("tokens", 0))
+            
+            logger.info(f"Model evaluation completed: Accuracy={evaluation_result['accuracy']:.2f}")
+            return evaluation_result
+        except Exception as e:
+            logger.error(f"Model evaluation failed: {str(e)}")
+            return None
+    
+    async def store_results(self, data):
+        """Store results in database"""
+        logger.info(f"Storing {len(data)} records to database")
+        try:
+            await self.db.connect()
+            result = await self.db.bulk_insert(
+                collection=self.topic,
+                documents=data
+            )
+            logger.info(f"Storage completed: {result['inserted_count']} documents inserted")
+            return result
+        except Exception as e:
+            logger.error(f"Storage failed: {str(e)}")
+            raise
+    
+    async def handle_critical_error(self, error):
+        """Handle critical errors in the system"""
+        logger.critical("Initiating critical error recovery sequence")
+        
+        # Step 1: Attempt self-healing
+        healing_result = await self.healer.diagnose_and_heal(error)
+        
+        if healing_result["success"]:
+            logger.info("Self-healing successful. Resuming operations.")
+            return
+        
+        # Step 2: Scale resources if possible
+        logger.warning("Self-healing failed. Attempting to scale resources.")
+        scale_result = await self.auto_scaler.scale_up()
+        
+        if scale_result["success"]:
+            logger.info("Resource scaling successful. Retrying operation.")
+            return
+        
+        # Step 3: Final fallback - restart container
+        logger.error("All recovery attempts failed. Triggering full restart.")
+        await self.trigger_restart()
+    
+    async def trigger_restart(self):
+        """Trigger a full system restart via cloud provider"""
+        logger.critical("Initiating system restart")
+        try:
+            # Implement cloud-specific restart logic
+            if os.getenv("CLOUD_PROVIDER") == "AZURE":
+                from .cloud import AzureDeployer
+                deployer = AzureDeployer()
+                await deployer.restart_container()
+            else:
+                # Generic restart fallback
+                os._exit(1)  # Force exit with error code
+        except:
+            os._exit(1)
+    
+    def _update_token_usage(self, tokens):
+        """Update token usage and check budget"""
+        if not tokens:
+            return
+            
+        self.total_tokens_used += tokens
+        self.cost_optimizer.track_usage(tokens)
+        
+        # Log if approaching budget limit
+        if self.total_tokens_used > self.token_budget * 0.8:
+            logger.warning(
+                f"Token usage approaching budget: {self.total_tokens_used}/{self.token_budget}"
+            )
+    
+    def get_status(self):
+        """Get current system status"""
+        return {
+            "topic": self.topic,
+            "last_successful_run": self.last_successful_run.isoformat() if self.last_successful_run else None,
+            "error_count": self.error_count,
+            "token_usage": f"{self.total_tokens_used}/{self.token_budget}",
+            "cost_today": self.cost_optimizer.get_daily_cost(),
+            "components": {
+                "meta_planner": self.meta_planner.get_status(),
+                "researcher": self.researcher.get_status(),
+                "scraper": self.scraper.get_status(),
+                "cleaner": self.cleaner.get_status(),
+                "trainer": self.trainer.get_status()
             }
         }
 
-class SuperSwarm:
-    def __init__(self, topic: str = "renewable energy in ASEAN"):
-        """
-        Initialize autonomous scraping swarm
-        
-        Args:
-            topic: Main research topic for the scraping session
-        """
-        self.topic = topic
-        self.ai_config = load_ai_config()
-        self.storage = DriveStorage()  # Primary storage
-        self.backup_storage = MongoDBStorage()  # Secondary storage
-        self.monitor = SystemMonitor()
-        self.cycle_count = 0
-        self.consecutive_failures = 0
-        self.start_time = datetime.now()
-        self.last_cycle_time = None
-        self.status = "INITIALIZING"
-        self.active_workers = 4  # Default worker count
-        self.max_workers = 8
-        self.min_workers = 2
-        self.scaling_threshold = 70  CPU usage percentage
-        
-        logger.info(f"🌀 Swarm Initialized | Topic: {self.topic}")
-        logger.info(f"System: {platform.system()} {platform.release()}")
-        logger.info(f"Python: {platform.python_version()}")
-        logger.info(f"Processor: {platform.processor()}")
-        logger.info(f"AI Models: {', '.join(self.ai_config.keys())}")
-        
-    async def run_cycle(self) -> bool:
-        """
-        Execute a full scraping cycle with self-healing capabilities
-        
-        Returns:
-            bool: True if cycle completed successfully, False otherwise
-        """
-        self.cycle_count += 1
-        cycle_start = datetime.now()
-        self.status = f"CYCLE_{self.cycle_count}_RUNNING"
-        
-        logger.info(f"\n{'='*50}")
-        logger.info(f"🚀 CYCLE {self.cycle_count} STARTED | Topic: {self.topic}")
-        logger.info(f"⏱️  Start Time: {cycle_start.strftime('%Y-%m-%d %H:%M:%S')}")
-        logger.info(f"👷 Active Workers: {self.active_workers}")
-        
-        try:
-            # Phase 1: System Health Check
-            if not await self._health_check():
-                logger.warning("System health check failed! Initiating self-healing...")
-                await self._self_heal("SYSTEM_HEALTH_CHECK_FAILURE")
-                return False
-
-            # Phase 2: AI-Powered Target Planning
-            logger.info("🧠 Phase 1: AI Target Planning")
-            targets = await self._plan_targets()
-            
-            if not targets:
-                logger.error("Target planning failed! No targets generated")
-                return False
-                
-            logger.info(f"🎯 Targets Identified: {len(targets)} URLs")
-
-            # Phase 3: Parallel Scraping Execution
-            logger.info("⚡ Phase 2: Parallel Scraping")
-            results = await self._execute_scraping(targets)
-            
-            successes = [r for r in results if r.get('status') == 'SUCCESS']
-            failures = [r for r in results if r.get('status') == 'FAILURE']
-            
-            logger.info(f"📊 Results: {len(successes)} ✅ | {len(failures)} ❌")
-
-            # Phase 4: Data Processing
-            logger.info("🧹 Phase 3: Data Processing")
-            processed_data = await self._process_data(successes)
-            
-            # Phase 5: Storage
-            logger.info("💾 Phase 4: Data Storage")
-            storage_results = await self._store_data(processed_data)
-            
-            # Phase 6: Failure Analysis and Healing
-            if failures:
-                logger.warning(f"⚠️ Failures detected: {len(failures)}")
-                await self._analyze_failures(failures)
-            
-            # Phase 7: Performance Optimization
-            await self._optimize_performance()
-            
-            # Update status and metrics
-            self.status = "IDLE"
-            cycle_duration = datetime.now() - cycle_start
-            self.last_cycle_time = cycle_duration.total_seconds()
-            
-            logger.info(f"✅ CYCLE COMPLETED | Duration: {str(cycle_duration)}")
-            self.consecutive_failures = 0  # Reset failure counter
-            return True
-            
-        except Exception as e:
-            self.consecutive_failures += 1
-            self.status = f"ERROR_CYCLE_{self.cycle_count}"
-            error_id = f"ERR-{time.strftime('%Y%m%d-%H%M%S')}"
-            
-            logger.critical(f"🚨 CYCLE FAILURE [{error_id}] | Error: {str(e)}")
-            logger.exception("Stack trace:")
-            
-            # Emergency healing for critical failures
-            if self.consecutive_failures >= 3:
-                logger.error("‼️ CONSECUTIVE FAILURES DETECTED! INITIATING EMERGENCY HEALING")
-                await self._emergency_heal(e, error_id)
-                
-            return False
-
-    async def _health_check(self) -> bool:
-        """Perform comprehensive system health check"""
-        logger.info("🩺 Running System Health Check")
-        
-        # Resource monitoring
-        cpu_usage = self.monitor.cpu_usage()
-        mem_usage = self.monitor.memory_usage()
-        disk_usage = self.monitor.disk_usage()
-        
-        logger.info(f"  CPU Usage: {cpu_usage}%")
-        logger.info(f"  Memory Usage: {mem_usage}%")
-        logger.info(f"  Disk Usage: {disk_usage}%")
-        
-        # Threshold checks
-        if cpu_usage > 90:
-            logger.warning("  High CPU usage detected!")
-            return False
-        if mem_usage > 85:
-            logger.warning("  High memory usage detected!")
-            return False
-        if disk_usage > 90:
-            logger.warning("  High disk usage detected!")
-            return False
-            
-        # AI service connectivity check
-        try:
-            async with aiohttp.ClientSession() as session:
-                for service, config in self.ai_config.items():
-                    health_url = config['endpoint'].replace('/completions', '/health')
-                    async with session.get(health_url, timeout=10) as response:
-                        if response.status != 200:
-                            logger.warning(f"  {service} health check failed!")
-                            return False
-            return True
-        except Exception as e:
-            logger.warning(f"Health check failed: {str(e)}")
-            return False
-
-    async def _plan_targets(self) -> List[str]:
-        """Generate scraping targets using AI planner"""
-        try:
-            planner = MetaPlanner()
-            return await planner.generate_scrape_plan(
-                self.topic, 
-                self.ai_config["CYPHER"]
-            )
-        except Exception as e:
-            logger.error(f"Target planning failed: {str(e)}")
-            # Fallback to predefined targets
-            return [
-                "https://aseanenergy.org",
-                "https://www.irena.org/",
-                "https://www.worldbank.org/en/region/eap/brief/asean",
-                "https://www.adb.org/sectors/energy/renewable-energy",
-                "https://www.asean-renewables.org/"
-            ]
-
-    async def _execute_scraping(self, targets: List[str]) -> List[Dict[str, Any]]:
-        """Execute parallel scraping operations"""
-        semaphore = asyncio.Semaphore(self.active_workers)
-        
-        async def _scrape_with_limit(target: str):
-            async with semaphore:
-                scraper = Scraper()
-                return await scraper.execute(target, self.ai_config["DEEPSEEK"])
-        
-        tasks = [_scrape_with_limit(target) for target in targets]
-        return await asyncio.gather(*tasks, return_exceptions=False)
-
-    async def _process_data(self, scraped_data: List[Dict]) -> List[Dict]:
-        """Process and clean scraped data"""
-        cleaner = DataCleaner()
-        processed = []
-        
-        for data in scraped_data:
-            try:
-                # Skip failed items
-                if data.get('status') != 'SUCCESS':
-                    continue
-                    
-                # Clean and transform data
-                cleaned = await cleaner.clean(
-                    data['content'], 
-                    self.ai_config["CLAUDE"]
-                )
-                
-                # Add metadata
-                processed.append({
-                    'metadata': {
-                        'source': data['url'],
-                        'scrape_time': data['timestamp'],
-                        'processing_time': datetime.now().isoformat(),
-                        'cycle': self.cycle_count
-                    },
-                    'content': cleaned
-                })
-            except Exception as e:
-                logger.error(f"Data processing failed: {str(e)}")
-                
-        return processed
-
-    async def _store_data(self, processed_data: List[Dict]) -> Dict[str, int]:
-        """Store processed data with redundancy"""
-        results = {
-            'primary': 0,
-            'backup': 0
-        }
-        
-        # Store in primary storage
-        if processed_data:
-            try:
-                results['primary'] = await self.storage.save_batch(processed_data)
-                logger.info(f"📦 Primary storage: Saved {results['primary']} items")
-            except Exception as e:
-                logger.error(f"Primary storage failed: {str(e)}")
-                
-            # Backup storage
-            try:
-                results['backup'] = await self.backup_storage.save_batch(processed_data)
-                logger.info(f"💽 Backup storage: Saved {results['backup']} items")
-            except Exception as e:
-                logger.error(f"Backup storage failed: {str(e)}")
-                
-        return results
-
-    async def _analyze_failures(self, failures: List[Dict]):
-        """Analyze and heal from failures"""
-        logger.info("🔍 Analyzing failures...")
-        
-        healer = Healer()
-        try:
-            # Perform failure analysis
-            diagnosis = await healer.diagnose(
-                failures, 
-                self.ai_config["CLAUDE"],
-                self.ai_config["CYPHER"]
-            )
-            
-            # Apply healing solutions
-            if diagnosis and diagnosis.get('solutions'):
-                logger.info("💊 Applying healing solutions")
-                await healer.apply_solutions(diagnosis['solutions'])
-        except Exception as e:
-            logger.error(f"Failure analysis failed: {str(e)}")
-
-    async def _optimize_performance(self):
-        """Optimize system performance based on metrics"""
-        logger.info("⚙️ Optimizing performance...")
-        
-        # Adjust workers based on CPU usage
-        current_cpu = self.monitor.cpu_usage()
-        
-        if current_cpu > self.scaling_threshold and self.active_workers < self.max_workers:
-            new_workers = min(self.active_workers + 2, self.max_workers)
-            logger.info(f"⬆️ Scaling UP workers: {self.active_workers} → {new_workers}")
-            self.active_workers = new_workers
-            
-        elif current_cpu < (self.scaling_threshold / 2) and self.active_workers > self.min_workers:
-            new_workers = max(self.active_workers - 1, self.min_workers)
-            logger.info(f"⬇️ Scaling DOWN workers: {self.active_workers} → {new_workers}")
-            self.active_workers = new_workers
-
-    async def _self_heal(self, issue_type: str):
-        """Perform self-healing for detected issues"""
-        logger.info(f"🛠️ Self-healing initiated for: {issue_type}")
-        
-        healer = Healer()
-        try:
-            # Get healing strategy from AI
-            solution = await healer.generate_healing_strategy(
-                issue_type, 
-                self.ai_config["CYPHER"]
-            )
-            
-            # Execute healing strategy
-            if solution:
-                logger.info(f"🔧 Applying solution: {solution[:100]}...")
-                await healer.apply_solution(solution)
-        except Exception as e:
-            logger.error(f"Self-healing failed: {str(e)}")
-
-    async def _emergency_heal(self, error: Exception, error_id: str):
-        """Emergency recovery procedure for critical failures"""
-        logger.critical("🚑 EMERGENCY HEALING PROCEDURE ACTIVATED!")
-        
-        try:
-            # Capture system state for diagnosis
-            state = {
-                'error': str(error),
-                'error_id': error_id,
-                'timestamp': datetime.now().isoformat(),
-                'system': {
-                    'os': f"{platform.system()} {platform.release()}",
-                    'python': platform.python_version(),
-                    'cpu': psutil.cpu_percent(),
-                    'memory': psutil.virtual_memory().percent,
-                    'disk': psutil.disk_usage('/').percent
-                },
-                'swarm_state': {
-                    'cycle': self.cycle_count,
-                    'consecutive_failures': self.consecutive_failures,
-                    'active_workers': self.active_workers,
-                    'status': self.status
-                }
-            }
-            
-            # Send diagnostic data to healing system
-            healer = Healer()
-            solution = await healer.emergency_heal(state, self.ai_config["CLAUDE"])
-            
-            # Execute emergency solution
-            if solution:
-                logger.info("🆘 Applying emergency solution...")
-                await healer.apply_solution(solution)
-                
-                # Reset system state
-                self.active_workers = self.min_workers
-                self.consecutive_failures = 0
-                self.status = "RECOVERY_MODE"
-                
-                logger.info("♻️ System reset to safe state")
-        except Exception as heal_error:
-            logger.critical(f"❌ CRITICAL UNRECOVERABLE FAILURE: {str(heal_error)}")
-            logger.critical("🛑 SYSTEM SHUTDOWN REQUIRED")
-            self.status = "FAILED"
-            # Implement graceful shutdown
-            await self._graceful_shutdown()
-
-    async def _graceful_shutdown(self):
-        """Perform graceful shutdown of the system"""
-        logger.info("🛑 Initiating graceful shutdown...")
-        # Clean up resources, close connections, etc.
-        await self.storage.close()
-        await self.backup_storage.close()
-        logger.info("🛑 System shutdown complete")
-        # Exit the application
-        raise SystemExit("Emergency shutdown")
-
-    def get_system_status(self) -> Dict[str, Any]:
-        """Get current system status report"""
-        return {
-            'status': self.status,
-            'cycle_count': self.cycle_count,
-            'consecutive_failures': self.consecutive_failures,
-            'active_workers': self.active_workers,
-            'start_time': self.start_time.isoformat(),
-            'last_cycle_duration': self.last_cycle_time,
-            'system_metrics': self.monitor.get_all_metrics(),
-            'ai_services': list(self.ai_config.keys())
-        }
-
-# Main execution flow
-async def main():
-    """Entry point for the swarm system"""
-    logger.info("🚀 Starting Super AI Scraper System")
-    
-    # Initialize swarm with topic
-    swarm = SuperSwarm(topic="renewable energy in ASEAN")
-    
-    # Run continuous cycles
-    while swarm.status != "FAILED":
-        await swarm.run_cycle()
-        
-        # Add delay between cycles based on performance
-        delay = 300  # 5 minutes default
-        if swarm.last_cycle_time and swarm.last_cycle_time > 120:
-            delay = 600  # 10 minutes if last cycle was long
-            
-        logger.info(f"⏳ Next cycle in {delay//60} minutes")
-        await asyncio.sleep(delay)
-    
-    logger.error("❌ System has entered FAILED state. Manual intervention required.")
-
+# Entry point for standalone execution
 if __name__ == "__main__":
+    # Create and run orchestrator
+    orchestrator = Orchestrator(topic="ASEAN Renewable Energy Trends")
+    
     try:
-        asyncio.run(main())
+        asyncio.run(orchestrator.run())
     except KeyboardInterrupt:
-        logger.info("🛑 System shutdown requested by user")
+        logger.info("Orchestrator shutdown by user")
     except Exception as e:
-        logger.critical(f"‼️ UNHANDLED SYSTEM FAILURE: {str(e)}")
+        logger.critical(f"Unrecoverable error: {str(e)}")
         raise
