@@ -1,153 +1,133 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-AI META PLANNER AGENT
-Version: 1.3.5
-Created: 2025-07-15
-Author: AI Strategy Team
+META PLANNER AGENT
+Version: 3.0.0
+Created: 2025-07-17
+Author: Muhammad-Fauzan22
 """
 
-import aiohttp
+import asyncio
 import json
 import logging
-import re
-from typing import List
+from typing import List, Dict
+from .base_agent import BaseAgent
 
 logger = logging.getLogger("MetaPlanner")
 
-class MetaPlanner:
-    def __init__(self, max_targets=20, max_retries=3):
-        self.max_targets = max_targets
-        self.max_retries = max_retries
-        
-    async def generate_scrape_plan(self, topic: str, api_config: dict) -> List[str]:
-        """Generate scraping plan using AI with fallback strategies"""
-        for attempt in range(self.max_retries):
-            try:
-                return await self._generate_with_ai(topic, api_config)
-            except Exception as e:
-                logger.warning(f"Planning attempt {attempt+1} failed: {str(e)}")
-                if attempt < self.max_retries - 1:
-                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
-        
-        # Fallback to predefined targets
-        logger.error("AI planning failed, using fallback targets")
-        return self._get_fallback_targets(topic)
+class MetaPlanner(BaseAgent):
+    def __init__(self, primary_config, fallback_config, cost_optimizer):
+        super().__init__(primary_config, fallback_config, cost_optimizer)
+        self.max_targets = 20
+        self.min_quality = 0.7
     
-    async def _generate_with_ai(self, topic: str, api_config: dict) -> List[str]:
-        """Generate target list using AI service"""
-        prompt = self._build_prompt(topic)
+    async def generate_scrape_plan(self, topic: str) -> Dict:
+        """Generate scraping plan with token optimization"""
+        # Check cache first
+        cache_key = f"plan_{topic.replace(' ', '_')}"
+        cached = await self.cache_get(cache_key)
+        if cached:
+            logger.info("Using cached scraping plan")
+            return cached
         
-        async with aiohttp.ClientSession() as session:
-            payload = {
-                "model": api_config["model"],
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert web scraping strategist specializing in ASEAN research data."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                "max_tokens": 2000,
-                "temperature": 0.3
-            }
-            
-            headers = {
-                "Authorization": f"Bearer {api_config['key']}",
-                "Content-Type": "application/json"
-            }
-            
-            async with session.post(
-                api_config["endpoint"],
-                json=payload,
-                headers=headers,
-                timeout=30
-            ) as response:
-                if response.status != 200:
-                    error = await response.text()
-                    raise RuntimeError(f"API error {response.status}: {error}")
-                
-                data = await response.json()
-                content = data["choices"][0]["message"]["content"]
-                return self._parse_response(content)
+        # Prepare the optimized prompt
+        prompt = self._build_optimized_prompt(topic)
+        
+        # Execute with token budget awareness
+        response = await self.execute_with_fallback(
+            prompt=prompt,
+            max_tokens=500,
+            temperature=0.3,
+            token_budget=self.token_budget_remaining
+        )
+        
+        # Process response
+        result = self._parse_response(response)
+        result["tokens"] = response.get("usage", {}).get("total_tokens", 0)
+        
+        # Cache result for future use
+        await self.cache_set(cache_key, result, ttl=86400)  # Cache for 24 hours
+        
+        return result
     
-    def _build_prompt(self, topic: str) -> str:
-        """Construct detailed prompt for target generation"""
+    def _build_optimized_prompt(self, topic: str) -> str:
+        """Construct efficient prompt for target generation"""
         return f"""
-        Generate a strategic web scraping plan for research on: {topic}
+        [SYSTEM]
+        You are an expert web scraping strategist specializing in ASEAN research data.
+        Generate a strategic scraping plan for: {topic}
         
-        Requirements:
+        [REQUIREMENTS]
         1. Focus on ASEAN region sources
-        2. Prioritize authoritative sources in this order:
-           - Government websites (.gov)
-           - International organizations (.org)
-           - Educational institutions (.edu)
-           - Reputable news sources
-        3. Include exactly {self.max_targets} distinct URLs
-        4. Ensure URLs cover multiple ASEAN countries
-        5. Include at least 3 data portal/repository sites
-        6. Format output as a JSON array of strings
+        2. Include exactly {self.max_targets} distinct URLs
+        3. Prioritize authoritative sources (.gov, .edu, .org)
+        4. Cover multiple ASEAN countries
+        5. Include at least 3 data portals
+        6. Format output as JSON: {{"targets": ["url1", "url2"]}}
         
-        Example output:
-        [
-            "https://data.aseanstats.org",
-            "https://www.singapore.gov.sg/energy",
-            "https://research.thailand.edu/renewables"
-        ]
+        [RESPONSE FORMAT]
+        JSON only, no additional text
         """
     
-    def _parse_response(self, content: str) -> List[str]:
-        """Extract URLs from AI response with validation"""
+    def _parse_response(self, response: Dict) -> Dict:
+        """Extract and validate plan from AI response"""
         try:
-            # Extract JSON from response
-            json_match = re.search(r'\[.*\]', content, re.DOTALL)
-            if not json_match:
-                raise ValueError("No JSON array found in response")
-                
-            urls = json.loads(json_match.group(0))
+            content = response["choices"][0]["message"]["content"]
             
-            # Validate URLs
-            if not isinstance(urls, list):
-                raise ValueError("Response is not a list")
-                
-            if len(urls) != self.max_targets:
-                logger.warning(f"Expected {self.max_targets} URLs, got {len(urls)}")
-                
-            # Filter and validate URLs
-            valid_urls = []
-            for url in urls:
-                if isinstance(url, str) and url.startswith(('http://', 'https://')):
-                    valid_urls.append(url)
+            # Clean JSON response
+            json_start = content.find('{')
+            json_end = content.rfind('}') + 1
+            json_str = content[json_start:json_end]
             
-            if not valid_urls:
-                raise ValueError("No valid URLs found in response")
+            plan = json.loads(json_str)
+            
+            # Validate structure
+            if "targets" not in plan:
+                raise ValueError("Invalid plan format: 'targets' key missing")
                 
-            return valid_urls
+            if not isinstance(plan["targets"], list):
+                raise ValueError("Invalid plan format: 'targets' should be a list")
+                
+            if len(plan["targets"]) < 5:  # Minimum 5 targets
+                raise ValueError("Insufficient targets generated")
+                
+            return plan
         except Exception as e:
-            logger.error(f"Response parsing failed: {str(e)}")
-            raise
+            logger.error(f"Plan parsing failed: {str(e)}")
+            
+            # Fallback to predefined targets
+            return {
+                "targets": self._get_fallback_targets(topic),
+                "source": "fallback"
+            }
     
     def _get_fallback_targets(self, topic: str) -> List[str]:
-        """Get predefined fallback targets based on topic"""
+        """Get predefined fallback targets"""
         base_targets = [
             "https://asean.org",
             "https://www.eria.org",
             "https://www.adb.org",
-            "https://www.worldbank.org/en/region/eap",
-            "https://data.worldbank.org"
+            "https://data.worldbank.org/region/east-asia-and-pacific",
+            "https://www.un.org/asia-pacific/"
         ]
         
         # Add topic-specific fallbacks
-        if "energy" in topic.lower():
+        topic_lower = topic.lower()
+        if "energy" in topic_lower:
             base_targets.extend([
                 "https://aseanenergy.org",
                 "https://www.asean-renewables.org",
                 "https://www.irena.org/asean",
                 "https://www.energy.gov.sg",
                 "https://www.doe.gov.ph"
+            ])
+        elif "economic" in topic_lower:
+            base_targets.extend([
+                "https://www.aseanstats.org",
+                "https://www.imf.org/en/Countries/ResRep/asean",
+                "https://www.worldbank.org/en/region/eap",
+                "https://www.mof.gov.sg",
+                "https://www.bsp.gov.ph"
             ])
         
         return base_targets[:self.max_targets]
