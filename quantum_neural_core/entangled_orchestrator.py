@@ -2827,7 +2827,7 @@ class EntangledOrchestrator:
             return graph_id
         
         except Exception as e:
-            logger.error(f"Kesalahan menyimpan metadata: {str(e)}")
+            logger.error(f"Kesalahan menyimpan meta {str(e)}")
             raise
 
     async def _quantum_teleport(self, orchestration_request: Dict[str, Any]) -> Dict[int, Dict]:
