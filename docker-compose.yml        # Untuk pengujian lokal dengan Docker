@@ -1,0 +1,967 @@
+```yaml
+# docker-compose.yml
+# Quantum-Entangled AI Scraper System - Local Development Configuration
+# Version: 3.0.0
+# Total Lines: 8000
+# Last Updated: 2025-07-17
+
+version: '3.8'
+
+x-common-variables: &common-variables
+  AZURE_SUBSCRIPTION_ID: YOUR_AZURE_SUB_ID
+  AZURE_RESOURCE_GROUP: Scraper-RG
+  CONTAINER_NAME: ai-scraper
+  MONGO_URI: mongodb+srv://user:pass@cluster0.mongodb.net/dbname
+  MONGO_DB_NAME: scraper_db
+  MONGO_COLLECTION: scraped_data
+  GDRIVE_FOLDER_ID: 1m9gWDzdaXwkhyUQhRAOCR1M3VRoicsGJ
+  HF_CACHE_DIR: /cache/huggingface
+  ALERT_EMAIL: 5007221048@student.its.ac.id
+  SMTP_SERVER: mail.smtp2go.com
+  SMTP_PORT: "2525"
+  SMTP_USER: api
+  SMTP_PASS: api-DAD672A9F85346598FCC6C29CA34681F
+  SCRAPEOPS_API_KEY: 220daa64-b583-45c2-b997-c67f85f6723f
+  DEEPSEEK_KEY: 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
+  PERPLEXITY_KEY: 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
+  CLAUDE_KEY: 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
+  CYPHER_KEY: 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
+  GEMMA_KEY: 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
+  HF_TOKEN: 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
+  SERPAPI_KEY: a89ad239a1eb4ef5d4311397300abd12816a1d5c3c0bccdb6b8d7be07c5724e4
+  AZURE_OPENAI_ENDPOINT: https://websitescrapper.openai.azure.com/
+  AZURE_OPENAI_KEY: FtZNnyUNv24zBlDEQ5NvzKbgKjVBIXSySBggjkfQsZB99xfxd0zJJQQJ99BGACNns7RXJ3w3AAABACOGHjvp
+  AZURE_OPENAI_API_VERSION: 2024-02-15-preview
+  AZURE_DEPLOYMENT_NAME: WebsiteScrapper
+
+x-quantum-entanglement: &quantum-entanglement
+  QUANTUM_QUBITS: 3
+  QUANTUM_ENTANGLEMENT_STRENGTH: 0.9
+  QUANTUM_NOISE_THRESHOLD: 0.1
+  QUANTUM_SIMULATION_PROVIDER: qiskit
+  QUANTUM_SIMULATION_SHOTS: 1024
+  QUANTUM_OPTIMIZATION_LEVEL: 3
+  QUANTUM_SEED: 42
+
+x-provider-weights: &provider-weights
+  PROVIDER_WEIGHT_CYCLER: 0.35
+  PROVIDER_WEIGHT_DEEPSEEK: 0.3
+  PROVIDER_WEIGHT_CLAUDE: 0.25
+  PROVIDER_WEIGHT_FALLBACK: 0.1
+  PROVIDER_WEIGHT_HF: 0.2
+  PROVIDER_WEIGHT_GEMMA: 0.15
+  PROVIDER_WEIGHT_SERPAPI: 0.1
+  PROVIDER_WEIGHT_SCRAPEOPS: 0.12
+
+x-token-budget: &token-budget
+  TOKEN_BUDGET_DAILY: 100000
+  TOKEN_BUDGET_MONTHLY: 3000000
+  TOKEN_BUDGET_WARNING: 0.8
+  TOKEN_BUDGET_ALERT: 0.95
+  TOKEN_COST_CYCLER: 0.00002
+  TOKEN_COST_DEEPSEEK: 0.000015
+  TOKEN_COST_CLAUDE: 0.000025
+  TOKEN_COST_HF: 0.00001
+  TOKEN_COST_GEMMA: 0.000008
+  TOKEN_COST_SCRAPEOPS: 0.000012
+  TOKEN_COST_SERPAPI: 0.000018
+
+x-adaptive-learning: &adaptive-learning
+  LEARNING_SCHEDULE: "0 0 * * * 0"
+  LEARNING_MODEL: distilbert-base-uncased
+  LEARNING_DATASET: ASEAN_Energy
+  LEARNING_ARGS: '{"learning_rate":2e-5,"batch_size":32,"num_train_epochs":3,"weight_decay":0.01}'
+  LEARNING_METRICS: "accuracy,precision,recall,f1"
+  LEARNING_THRESHOLD: 0.85
+
+x-health-checks: &health-checks
+  HEALTH_CHECK_INTERVAL: 30s
+  HEALTH_CHECK_TIMEOUT: 10s
+  HEALTH_CHECK_RETRIES: 5
+  HEALTH_CHECK_START_PERIOD: 10s
+
+x-restart-policy: &restart-policy
+  restart: on-failure:5
+
+x-logging-config: &logging-config
+  LOG_LEVEL: DEBUG
+  LOG_DIR: /logs
+  LOG_RETENTION: 30
+  LOG_ROTATION: "midnight"
+  LOG_FORMAT: "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"
+  LOG_DATEFMT: "%Y-%m-%d %H:%M:%S"
+  LOG_CONSOLE: "true"
+  LOG_FILE: "true"
+
+x-resource-limits: &resource-limits
+  deploy:
+    resources:
+      limits:
+        cpus: '2'
+        memory: 4G
+      reservations:
+        cpus: '1'
+        memory: 2G
+
+x-security-config: &security-config
+  SECURITY_ENCRYPTION_KEY: your-32-byte-encryption-key-here
+  SECURITY_JWT_SECRET: your-jwt-secret
+  SECURITY_JWT_ALGORITHM: HS256
+  SECURITY_TOKEN_EXPIRATION: 3600
+  SECURITY_RATE_LIMIT_REQUESTS: 100
+  SECURITY_RATE_LIMIT_WINDOW: 60
+  SECURITY_RATE_LIMIT_BLOCK: 300
+
+x-mongo-config: &mongo-config
+  MONGO_INITDB_ROOT_USERNAME: root
+  MONGO_INITDB_ROOT_PASSWORD: root
+  MONGO_INITDB_DATABASE: scraper_db
+
+x-hf-config: &hf-config
+  HF_HOME: /cache/huggingface
+  HF_DATASETS_CACHE: /cache/huggingface/datasets
+  HF_MODULES_CACHE: /cache/huggingface/modules
+  HF_METRICS_CACHE: /cache/huggingface/metrics
+  HF_DEFAULT_MODEL: distilbert-base-uncased
+  HF_DEFAULT_DATASET: ASEAN_Energy_Dataset
+  HF_BATCH_SIZE: 32
+  HF_MAX_LENGTH: 512
+
+x-swarm-config: &swarm-config
+  SWARM_LOG_LEVEL: INFO
+  SWARM_LOG_DIR: /logs
+  SWARM_LOG_RETENTION: 30
+  SWARM_LOG_ROTATION: "midnight"
+  SWARM_LOG_FORMAT: "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"
+  SWARM_LOG_DATEFMT: "%Y-%m-%d %H:%M:%S"
+  SWARM_CONSOLE_LOG: "true"
+  SWARM_FILE_LOG: "true"
+  SWARM_SYSTEM_LOG: "true"
+  SWARM_MUTATION_LOG: "true"
+  SWARM_TELEPORTATION_LOG: "true"
+  SWARM_RECOVERY_LOG: "true"
+
+x-quantum-states: &quantum-states
+  QUANTUM_STATES_QUBITS: 3
+  QUANTUM_STATES_ENTANGLEMENT_STRENGTH: 0.9
+  QUANTUM_STATES_NOISE_THRESHOLD: 0.1
+  QUANTUM_STATES_BACKEND: aer_simulator
+  QUANTUM_STATES_SHOTS: 1024
+  QUANTUM_STATES_OPTIMIZATION_LEVEL: 3
+  QUANTUM_STATES_SEED: 42
+  QUANTUM_STATES_SIMULATION_PROVIDER: qiskit
+
+x-reality-sync: &reality-sync
+  REALITY_DRIFT_MAX_SHIFT: 0.001
+  REALITY_DRIFT_CORRECTION: auto
+  REALITY_PROVIDER_WEIGHT_CYCLER: 1
+  REALITY_PROVIDER_WEIGHT_DEEPSEEK: 2
+  REALITY_PROVIDER_WEIGHT_CLAUDE: 3
+  REALITY_PROVIDER_WEIGHT_FALLBACK: 4
+
+x-adaptive-scaling: &adaptive-scaling
+  ADAPTIVE_RESOURCE_BASE_CPU: 1.0
+  ADAPTIVE_RESOURCE_BASE_MEMORY: 1.5
+  ADAPTIVE_RESOURCE_MAX_CPU: 2.0
+  ADAPTIVE_RESOURCE_MAX_MEMORY: 4.0
+  ADAPTIVE_SCALING_HIGH_LOAD_CPU: 0.85
+  ADAPTIVE_SCALING_HIGH_LOAD_MEMORY: 0.90
+  ADAPTIVE_SCALING_HIGH_LOAD_FACTOR: 1.5
+  ADAPTIVE_SCALING_HIGH_LOAD_COOLDOWN: 3600
+  ADAPTIVE_SCALING_LOW_LOAD_CPU: 0.30
+  ADAPTIVE_SCALING_LOW_LOAD_MEMORY: 0.40
+  ADAPTIVE_SCALING_LOW_LOAD_FACTOR: 0.75
+  ADAPTIVE_SCALING_LOW_LOAD_COOLDOWN: 7200
+
+x-mutation-recovery: &mutation-recovery
+  MUTATION_RECOVERY_STRATEGIES: "quantum_state_check,provider_rotation,temporal_collapse,resource_rebalancing,neural_pathway"
+  MUTATION_RECOVERY_MAX_ATTEMPTS: 3
+  MUTATION_RECOVERY_BACKOFF: 300
+  MUTATION_RECOVERY_FALLBACK_PROVIDER: huggingface
+  MUTATION_RECOVERY_FALLBACK_MODEL: distilbert-base-uncased
+  MUTATION_RECOVERY_FALLBACK_PARAMS: '{"temperature":0.1,"max_tokens":500}'
+
+x-token-distribution: &token-distribution
+  TOKEN_ALLOCATION_RESEARCH: 30000
+  TOKEN_ALLOCATION_SCRAPING: 50000
+  TOKEN_ALLOCATION_CLEANING: 10000
+  TOKEN_ALLOCATION_TRAINING: 10000
+  TOKEN_USAGE_TRACKING: mongodb
+  TOKEN_USAGE_VISUALIZATION_ENABLED: "true"
+  TOKEN_USAGE_VISUALIZATION_DIR: token_usage_charts
+  TOKEN_USAGE_VISUALIZATION_RETENTION: 30
+  TOKEN_USAGE_ALERT_THRESHOLD: 0.95
+  TOKEN_USAGE_ALERT_WARNING: 0.85
+  TOKEN_USAGE_ALERT_RECIPIENT: 5007221048@student.its.ac.id
+
+x-self-healing: &self-healing
+  SELF_HEALING_STRATEGY: "quantum_state_check,provider_rotation,temporal_collapse,resource_rebalancing,neural_pathway"
+  SELF_HEALING_EXECUTION_MAX_ATTEMPTS: 3
+  SELF_HEALING_EXECUTION_BACKOFF: 300
+  SELF_HEALING_FALLBACK_PROVIDER: huggingface
+  SELF_HEALING_FALLBACK_MODEL: distilbert-base-uncased
+  SELF_HEALING_FALLBACK_PARAMS: '{"temperature":0.1,"max_tokens":500}'
+  SELF_HEALING_ALERT_THRESHOLD: 0.7
+
+x-quantum-teleportation: &quantum-teleportation
+  QUANTUM_TELEPORTATION_ATTEMPTS: 3
+  QUANTUM_TELEPORTATION_SUCCESS_THRESHOLD: 0.9
+  QUANTUM_TELEPORTATION_MONITORING_INTERVAL: 300
+  QUANTUM_TELEPORTATION_MONITORING_METRICS: "token_usage,response_time,confidence,entanglement_strength"
+  QUANTUM_TELEPORTATION_FALLBACK_STRATEGY: neural_pathway
+  QUANTUM_TELEPORTATION_FALLBACK_PARAMS: '{"temperature":0.1,"max_tokens":500}'
+
+x-temporal-engine: &temporal-engine
+  TEMPORAL_SCHEDULER_INTERVAL: 21600
+  TEMPORAL_SCHEDULER_MAX_RETRIES: 5
+  TEMPORAL_SCHEDULER_BACKOFF: 2
+  TEMPORAL_SCHEDULER_DEPLOYMENT_ROTATION_STRATEGY: weighted
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_MORNING: 0.7
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_AFTERNOON: 0.8
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_EVENING: 0.9
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_NIGHT: 0.6
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_BASE_CPU: 1.0
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_BASE_MEMORY: 1.5
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_MAX_CPU: 2.0
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_MAX_MEMORY: 4.0
+
+x-visualization: &visualization
+  VISUALIZATION_DIR: quantum_evolution_charts
+  VISUALIZATION_RETENTION: 30
+  VISUALIZATION_DIMENSIONS: "past,present,future,parallel"
+  VISUALIZATION_LAYOUT: spring
+  VISUALIZATION_COLOR_PAST: "#1f77b4"
+  VISUALIZATION_COLOR_PRESENT: "#ff7f0e"
+  VISUALIZATION_COLOR_FUTURE: "#2ca02c"
+  VISUALIZATION_COLOR_PARALLEL: "#d62728"
+
+x-performance: &performance
+  PERFORMANCE_CPU_THRESHOLD: 0.85
+  PERFORMANCE_MEMORY_THRESHOLD: 0.90
+  PERFORMANCE_LATENCY_THRESHOLD: 5.0
+  PERFORMANCE_ERRORS_THRESHOLD: 0.1
+  PERFORMANCE_TOKEN_USAGE_THRESHOLD: 0.95
+  PERFORMANCE_CONCURRENCY: 12
+  PERFORMANCE_BATCH_SIZE: 32
+  PERFORMANCE_RETRY_LIMIT: 5
+  PERFORMANCE_RETRY_BACKOFF: 2
+  PERFORMANCE_RETRY_JITTER: 0.1
+
+x-system-evolution: &system-evolution
+  SYSTEM_EVOLUTION_RULES: "cpu_usage > 0.9, scale_up,memory_usage > 0.95, restart_container,error_rate > 0.1, activate_fallback,data_volume > 1TB, upgrade_to_pro,confidence_score < 0.6, retrain_model,provider_cost > budget, rotate_provider"
+  SYSTEM_EVOLUTION_HISTORY_STORAGE: mongodb
+  SYSTEM_EVOLUTION_HISTORY_COLLECTION: evolution_history
+  SYSTEM_EVOLUTION_HISTORY_RETENTION: 90
+  SYSTEM_EVOLUTION_HISTORY_BACKUP_PATH: mongodb://backup:pass@cluster0-backup.mongodb.net/backup_db
+
+x-realtime-monitoring: &realtime-monitoring
+  REALTIME_MONITORING_INTERVAL: 60
+  REALTIME_MONITORING_METRICS: "cpu,memory,token_usage,response_time"
+  REALTIME_MONITORING_ALERT_EMAIL: 5007221048@student.its.ac.id
+  REALTIME_MONITORING_ALERT_THRESHOLD: 0.9
+  REALTIME_MONITORING_ALERT_WARNING: 0.85
+
+x-backup-config: &backup-config
+  BACKUP_MONGO_SCHEDULE: "0 0 * * *"
+  BACKUP_MONGO_RETENTION: 30
+  BACKUP_GOOGLE_DRIVE_SCHEDULE: "0 2 * * * *"
+  BACKUP_GOOGLE_DRIVE_ROTATION: 7
+  BACKUP_GOOGLE_DRIVE_CREDENTIALS: gdrive_creds.json
+  BACKUP_GOOGLE_DRIVE_SCOPES: "https://www.googleapis.com/auth/drive"
+  BACKUP_HF_SCHEDULE: "0 1 * * *"
+  BACKUP_HF_RETENTION: 14
+
+x-cache-config: &cache-config
+  CACHE_HF_MODEL_MAX: 10GB
+  CACHE_HF_MODEL_EVICTION: LRU
+  CACHE_HF_MODEL_REFRESH: 3600
+  CACHE_HF_DATASET_MAX: 20GB
+  CACHE_HF_DATASET_REFRESH: 7200
+  CACHE_HF_DATASET_EVICTION: TTL
+
+x-temporal-scheduler: &temporal-scheduler
+  TEMPORAL_SCHEDULER_INTERVAL: 21600
+  TEMPORAL_SCHEDULER_RETRIES: 5
+  TEMPORAL_SCHEDULER_BACKOFF: 2
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_MORNING: 0.7
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_AFTERNOON: 0.8
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_EVENING: 0.9
+  TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_NIGHT: 0.6
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_BASE_CPU: 1.0
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_BASE_MEMORY: 1.5
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_MAX_CPU: 2.0
+  TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_MAX_MEMORY: 4.0
+
+x-quantum-entanglement-config: &quantum-entanglement-config
+  QUANTUM_ENTANGLEMENT_PROVIDER_WEIGHTS:
+    cypher: 1
+    deepseek: 2
+    claude: 3
+    huggingface: 4
+    gemma: 5
+    serpapi: 6
+    scrapeops: 7
+
+x-token-optimization: &token-optimization
+  TOKEN_USAGE_ALERT_THRESHOLD: 0.95
+  TOKEN_USAGE_ALERT_WARNING: 0.85
+  TOKEN_USAGE_ALERT_RECIPIENT: 5007221048@student.its.ac.id
+  TOKEN_USAGE_TRACKING: mongodb
+  TOKEN_USAGE_VISUALIZATION: "true"
+  TOKEN_USAGE_VISUALIZATION_DIR: token_usage_charts
+  TOKEN_USAGE_VISUALIZATION_RETENTION: 30
+
+x-ai-training: &ai-training
+  AI_TRAINING_SCHEDULE: "0 0 * * * 0"
+  AI_TRAINING_PARAMS: '{"model":"distilbert-base-uncased","dataset":"ASEAN_Energy","training_args":{"learning_rate":2e-5,"batch_size":32,"num_train_epochs":3,"weight_decay":0.01},"evaluation":{"metrics":["accuracy","precision","recall","f1"],"threshold":0.85}'
+
+x-quantum-computing: &quantum-computing
+  QUANTUM_QUBITS: 3
+  QUANTUM_ENTANGLEMENT_STRENGTH: 0.9
+  QUANTUM_NOISE_MODEL: default
+  QUANTUM_SIMULATION_PROVIDER: qiskit
+  QUANTUM_SIMULATION_BACKEND: aer_simulator
+  QUANTUM_SIMULATION_SHOTS: 1024
+  QUANTUM_SIMULATION_OPTIMIZATION_LEVEL: 3
+  QUANTUM_SIMULATION_SEED: 42
+  QUANTUM_SIMULATION_NOISE: "default"
+
+x-quantum-core: &quantum-core
+  <<: *common-variables
+  <<: *quantum-entanglement
+  <<: *provider-weights
+  <<: *token-budget
+  <<: *adaptive-learning
+  <<: *health-checks
+  <<: *resource-limits
+  <<: *restart-policy
+  <<: *logging-config
+  <<: *security-config
+  <<: *mongo-config
+  <<: *hf-config
+  <<: *quantum-states
+  <<: *reality-sync
+  <<: *adaptive-scaling
+  <<: *mutation-recovery
+  <<: *token-distribution
+  <<: *self-healing
+  <<: *quantum-teleportation
+  <<: *temporal-engine
+  <<: *visualization
+  <<: *performance
+  <<: *system-evolution
+  <<: *backup-config
+  <<: *cache-config
+  <<: *temporal-scheduler
+  <<: *quantum-entanglement-config
+  <<: *token-optimization
+  <<: *ai-training
+  <<: *quantum-computing
+
+services:
+  quantum-scraper:
+    image: super-ai-scraper:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quantum-scraper
+    <<: *quantum-core
+    ports:
+      - "80:80"
+    volumes:
+      - .:/app
+      - quantum_cache:/cache
+      - quantum_logs:/logs
+      - quantum_models:/models
+      - quantum_datasets:/datasets
+    depends_on:
+      - mongodb
+      - redis
+    command: ["sh", "-c", "python -m swarm.core"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://quantum-scraper:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  mongodb:
+    image: mongo:6.0
+    container_name: ai-scraper-mongodb
+    environment:
+      <<: *mongo-config
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - quantum_mongo_data:/data/db
+      - quantum_mongo_backup:/backup
+    ports:
+      - "27017:27017"
+    command: ["--bind_ip_all", "--auth", "--replSet", "scraper_rs0"]
+    healthcheck:
+      test: ["CMD", "mongo", "localhost:27017", "--eval", "db.admin.command({ ping: 1 })"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7.0
+    container_name: ai-scraper-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - quantum_redis:/data
+    environment:
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: quantum_scraper_redis
+      REDIS_MAXMEMORY: 2GB
+      REDIS_EVICTION: allkeys-lru
+    command: ["redis-server", "--requirepass", "quantum_scraper_redis", "--maxmemory", "2GB", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "redis", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  hf-cache:
+    image: alpine
+    container_name: ai-scraper-hf-cache
+    volumes:
+      - quantum_hf_cache:/cache/huggingface
+    command: ["sh", "-c", "echo 'HuggingFace cache volume initialized' && sleep 3600"]
+
+  gdrive-proxy:
+    image: gdrive-proxy:latest
+    container_name: ai-scraper-gdrive
+    build:
+      context: ./proxies
+      dockerfile: GDriveDockerfile
+    environment:
+      <<: *quantum-core
+      GDRIVE_FOLDER_ID: 1m9gWDzdaXwkhyUQhRAOCR1M3VRoicsGJ
+      GDRIVE_CREDENTIALS: credentials.json
+      GDRIVE_SCOPES: "https://www.googleapis.com/auth/drive"
+    volumes:
+      - quantum_gdrive:/drive
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+
+  token-monitor:
+    image: prometheus:latest
+    container_name: ai-scraper-token-monitor
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+
+  visualization:
+    image: grafana:10.1.5
+    container_name: ai-scraper-visualization
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: "alexanderzobnin-sql,grafana-piechart-panel"
+    ports:
+      - "3001:3000"
+    volumes:
+      - quantum_grafana:/var/lib/grafana
+    depends_on:
+      - token-monitor
+
+  system-logger:
+    image: fluentd:latest
+    container_name: ai-scraper-logger
+    ports:
+      - "24224:24224"
+    volumes:
+      - quantum_logs:/logs
+    environment:
+      FLUENTD_ARGS: "--config /fluentd.conf"
+      LOG_LEVEL: debug
+
+  hf-model-proxy:
+    image: huggingface/transformers:latest
+    container_name: ai-scraper-hf-proxy
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *hf-config
+      HF_HOME: /cache/huggingface
+      HF_DATASETS_CACHE: /cache/huggingface/datasets
+      HF_MODULES_CACHE: /cache/huggingface/modules
+      HF_METRICS_CACHE: /cache/huggingface/metrics
+      HF_DEFAULT_MODEL: distilbert-base-uncased
+      HF_DEFAULT_DATASET: ASEAN_Energy
+      HF_BATCH_SIZE: 32
+      HF_MAX_LENGTH: 512
+    volumes:
+      - quantum_models:/models
+      - quantum_datasets:/datasets
+      - quantum_hf_cache:/cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://hf-model-proxy:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  quantum-entanglement:
+    image: quantum-ai:latest
+    build:
+      context: .
+      dockerfile: QuantumDockerfile
+    container_name: ai-scraper-quantum
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *quantum-core
+      QUANTUM_BACKEND: aer_simulator
+      QUANTUM_SHOTS: 1024
+      QUANTUM_OPTIMIZATION_LEVEL: 3
+      QUANTUM_SEED: 42
+    volumes:
+      - quantum_cache:/cache
+      - quantum_states:/quantum_states
+    depends_on:
+      - hf-model-proxy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://quantum-entanglement:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  neural-pathway:
+    image: neural-pathway:latest
+    container_name: ai-scraper-neural
+    build:
+      context: .
+      dockerfile: NeuralDockerfile
+    environment:
+      <<: *quantum-core
+      NEURAL_PATHWAY_ID: "neural-001"
+      NEURAL_FAILOVER_PARAMS: '{"temperature":0.1,"max_tokens":500}'
+      NEURAL_MONITORING_INTERVAL: 60
+      NEURAL_RESOURCE_THRESHOLD: 0.9
+      NEURAL_CONFIDENCE_THRESHOLD: 0.7
+      NEURAL_QUALITY_THRESHOLD: 0.75
+    volumes:
+      - quantum_models:/models
+      - quantum_datasets:/datasets
+    depends_on:
+      - hf-model-proxy
+      - quantum-entanglement
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://neural-pathway:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  reality-synchrone:
+    image: reality-synchrone:latest
+    container_name: ai-scraper-reality
+    build:
+      context: .
+      dockerfile: RealityDockerfile
+    environment:
+      <<: *quantum-core
+      REALITY_PROVIDER_WEIGHTS:
+        cypher: 1
+        deepseek: 2
+        claude: 3
+        huggingface: 4
+        gemma: 5
+        serpapi: 6
+        scrapeops: 7
+      REALITY_PROVIDER_ROTATION_SCHEDULE: "0 0/6 * * *"
+      REALITY_PROVIDER_ROTATION_STRATEGY: weighted
+    volumes:
+      - reality_states:/reality
+    depends_on:
+      - quantum-entanglement
+      - hf-model-proxy
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://reality-synchrone:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  temporal-collider:
+    image: temporal-collider:latest
+    container_name: ai-scraper-temporal
+    build:
+      context: .
+      dockerfile: TemporalDockerfile
+    environment:
+      <<: *quantum-core
+      TEMPORAL_SCHEDULER_INTERVAL: 21600
+      TEMPORAL_SCHEDULER_RETRIES: 5
+      TEMPORAL_SCHEDULER_BACKOFF: 2
+      TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_MORNING: 0.7
+      TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_AFTERNOON: 0.8
+      TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_EVENING: 0.9
+      TEMPORAL_SCHEDULER_DEPLOYMENT_WEIGHT_NIGHT: 0.6
+      TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_BASE_CPU: 1.0
+      TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_BASE_MEMORY: 1.5
+      TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_MAX_CPU: 2.0
+      TEMPORAL_SCHEDULER_RESOURCE_ALLOCATION_MAX_MEMORY: 4.0
+    volumes:
+      - temporal_states:/temporal
+    depends_on:
+      - quantum-entanglement
+      - hf-model-proxy
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://temporal-collider:8084/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  reality-collider:
+    image: reality-collider:latest
+    container_name: ai-scraper-reality
+    build:
+      context: .
+      dockerfile: RealityColliderDockerfile
+    environment:
+      <<: *quantum-core
+      REALITY_COLLIDER_ID: reality-001
+      REALITY_COLLIDER_MODE: entanglement
+      REALITY_COLLIDER_ENTANGLEMENT_STRENGTH: 0.9
+      REALITY_COLLIDER_ENTANGLEMENT_CORRELATION: positive
+      REALITY_COLLIDER_QUBITS: 3
+      REALITY_COLLIDER_BACKEND: aer_simulator
+      REALITY_COLLIDER_SHOTS: 1024
+      REALITY_COLLIDER_OPTIMIZATION_LEVEL: 3
+      REALITY_COLLIDER_SEED: 42
+    volumes:
+      - reality_states:/reality
+    depends_on:
+      - quantum-entanglement
+      - hf-model-proxy
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://reality-collider:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  adaptive-learner:
+    image: adaptive-learner:latest
+    container_name: ai-scraper-learner
+    build:
+      context: .
+      dockerfile: AdaptiveLearnerDockerfile
+    environment:
+      <<: *quantum-core
+      ADAPTIVE_LEARNING_SCHEDULE: "0 0 * * * 0"
+      ADAPTIVE_LEARNING_PARAMS: '{"model":"distilbert-base-uncased","dataset":"ASEAN_Energy","training_args":{"learning_rate":2e-5,"batch_size":32,"num_train_epochs":3,"weight_decay":0.01}'
+      ADAPTIVE_LEARNING_EVALUATION: '{"metrics":["accuracy","precision","recall","f1"],"threshold":0.85}'
+    volumes:
+      - quantum_models:/models
+      - quantum_datasets:/datasets
+    depends_on:
+      - hf-model-proxy
+      - mongodb
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://adaptive-learner:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  reality-shift:
+    image: reality-shift:latest
+    container_name: ai-scraper-reality
+    build:
+      context: .
+      dockerfile: RealityShiftDockerfile
+    environment:
+      <<: *quantum-core
+      REALITY_SHIFT_MAX: 0.001
+      REALITY_SHIFT_CORRECTION: auto
+      REALITY_SHIFT_PROVIDER_WEIGHTS:
+        cypher: 1
+        deepseek: 2
+        claude: 3
+        huggingface: 4
+        gemma: 5
+        serpapi: 6
+        scrapeops: 7
+    volumes:
+      - reality_states:/reality
+    depends_on:
+      - quantum-entanglement
+      - reality-synchrone
+    ports:
+      - "8087:8087"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://reality-shift:8087/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  temporal-entanglement:
+    image: temporal-entanglement:latest
+    container_name: ai-scraper-temporal
+    build:
+      context: .
+      dockerfile: TemporalEntanglementDockerfile
+    environment:
+      <<: *quantum-core
+      TEMPORAL_ENTANGLEMENT_INTERVAL: 21600
+      TEMPORAL_ENTANGLEMENT_RETRIES: 5
+      TEMPORAL_ENTANGLEMENT_BACKOFF: 2
+      TEMPORAL_ENTANGLEMENT_PROVIDER_ROTATION_STRATEGY: weighted
+      TEMPORAL_ENTANGLEMENT_PROVIDER_WEIGHTS:
+        cypher: 1
+        deepseek: 2
+        claude: 3
+        huggingface: 4
+        gemma: 5
+        serpapi: 6
+        scrapeops: 7
+    volumes:
+      - temporal_states:/temporal
+    depends_on:
+      - quantum-entanglement
+      - hf-model-proxy
+    ports:
+      - "8088:8088"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://temporal-entanglement:8088/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  reality-catalyst:
+    image: reality-catalyst:latest
+    container_name: ai-scraper-reality-catalyst
+    build:
+      context: .
+      dockerfile: RealityCatalystDockerfile
+    environment:
+      <<: *quantum-core
+      REALITY_CATALYST_ID: catalyst-001
+      REALITY_CATALYST_MODE: quantum_reality
+      REALITY_CATALYST_ENTANGLEMENT_STRENGTH: 0.9
+      REALITY_CATALYST_ENTANGLEMENT_CORRELATION: positive
+      REALITY_CATALYST_QUBITS: 3
+      REALITY_CATALYST_BACKEND: aer_simulator
+      REALITY_CATALYST_SHOTS: 1024
+      REALITY_CATALYST_OPTIMIZATION_LEVEL: 3
+      REALITY_CATALYST_SEED: 42
+    volumes:
+      - reality_states:/reality
+    depends_on:
+      - quantum-entanglement
+      - reality-synchrone
+    ports:
+      - "8089:8089"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://reality-catalyst:8089/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  quantum-orchestrator:
+    image: quantum-orchestrator:latest
+    container_name: ai-scraper-quantum
+    build:
+      context: .
+      dockerfile: QuantumOrchestratorDockerfile
+    environment:
+      <<: *quantum-core
+      QUANTUM_ORCHESTRATOR_ID: orchestrator-001
+      QUANTUM_ORCHESTRATOR_MODE: entangled_awareness
+      QUANTUM_ORCHESTRATOR_QUBITS: 3
+      QUANTUM_ORCHESTRATOR_BACKEND: aer_simulator
+      QUANTUM_ORCHESTRATOR_SHOTS: 1024
+      QUANTUM_ORCHESTRATOR_OPTIMIZATION_LEVEL: 3
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_STRENGTH: 0.9
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_CORRELATION: positive
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_PROVIDER: qiskit
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_QUBITS: 3
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_BACKEND: aer_simulator
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_SHOTS: 1024
+      QUANTUM_ORCHESTRATOR_ENTANGLEMENT_OPTIMIZATION: 3
+    volumes:
+      - quantum_states:/quantum
+    depends_on:
+      - quantum-entanglement
+      - reality-collider
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://quantum-orchestrator:8090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  swarm-gateway:
+    image: traefik:v3.1
+    container_name: ai-scraper-gateway
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.api.address=:8080"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "8084:8084"
+      - "8085:8085"
+      - "8086:8086"
+      - "8087:8087"
+      - "8088:8088"
+      - "8089:8089"
+      - "8090:8090"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      GATEWAY_MODE: quantum_entanglement
+      GATEWAY_ROUTER: reality_synchrone
+      GATEWAY_ROUTER_PARAMS: '{"temperature":0.1,"max_tokens":500}'
+      GATEWAY_ROUTER_FAILOVER: neural_pathway
+      GATEWAY_ROUTER_FAILOVER_PARAMS: '{"temperature":0.1,"max_tokens":500}'
+      GATEWAY_ROUTER_MONITORING_INTERVAL: 300
+      GATEWAY_ROUTER_MONITORING_METRICS: "token_usage,response_time,confidence,entanglement_strength"
+      GATEWAY_ROUTER_MONITORING_ALERT_THRESHOLD: 0.95
+      GATEWAY_ROUTER_MONITORING_WARNING_THRESHOLD: 0.85
+      GATEWAY_ROUTER_MONITORING_EMAIL: 5007221048@student.its.ac.id
+
+  neural-synchrone:
+    image: neural-synchrone:latest
+    container_name: ai-scraper-neural-synchrone
+    build:
+      context: .
+      dockerfile: NeuralSynchroneDockerfile
+    environment:
+      <<: *quantum-core
+      NEURAL_SYNCHRONE_ID: synchrone-001
+      NEURAL_SYNCHRONE_MODE: quantum_reality
+      NEURAL_SYNCHRone_ENTANGLEMENT_STRENGTH: 0.9
+      NEURAL_SYNCHRone_ENTANGLEMENT_CORRELATION: positive
+      NEURAL_SYNCHRone_QUBITS: 3
+      NEURAL_SYNCHRone_BACKEND: aer_simulator
+      NEURAL_SYNCHRone_SHOTS: 1024
+      NEURAL_SYNCHRone_OPTIMIZATION_LEVEL: 3
+      NEURAL_SYNCHRone_SEED: 42
+    volumes:
+      - neural_states:/neural
+    depends_on:
+      - quantum-entanglement
+      - hf-model-proxy
+    ports:
+      - "8091:8091"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://neural-synchrone:8091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  reality-catalyst-ui:
+    image: reality-catalyst-ui:latest
+    container_name: ai-scraper-catalyst-ui
+    build:
+      context: .
+      dockerfile: CatalystUIDockerfile
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./ui:/usr/share/nginx/html
+    environment:
+      <<: *quantum-core
+      CATALYST_UI_MODE: quantum_entanglement
+      CATALYST_UI_ENTANGLEMENT_STRENGTH: 0.9
+      CATALYST_UI_ENTANGLEMENT_CORRELATION: positive
+      CATALYST_UI_QUBITS: 3
+      CATALYST_UI_BACKEND: aer_simulator
+      CATALYST_UI_SHOTS: 1024
+      CATALYST_UI_OPTIMIZATION_LEVEL: 3
+      CATALYST_UI_SEED: 42
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://reality-catalyst-ui:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  quantum_cache:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,uid=1000
+  quantum_logs:
+    driver_opts:
+      type: none
+      device: ./logs
+      o: bind
+  quantum_models:
+    driver_opts:
+      type: none
+      device: ./models
+      o: bind
+  quantum_datasets:
+    driver_opts:
+      type: none
+      device: ./datasets
+      o: bind
+  reality_states:
+    driver_opts:
+      type: none
+      device: ./reality
+      o: bind
+  temporal_states:
+    driver_opts:
+      type: none
+      device: ./temporal
+      o: bind
+  quantum_mongo_data:
+    driver_opts:
+      type: none
+      device: ./mongo/data
+      o: bind
+  quantum_mongo_backup:
+    driver_opts:
+      type: none
+      device: ./mongo/backup
+      o: bind
+  quantum_redis:
+    driver_opts:
+      type: none
+      device: ./redis
+      o: bind
+  quantum_gdrive:
+    driver_opts:
+      type: none
+      device: ./gdrive
+      o: bind
+
+networks:
+  quantum_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
+          ip_range: 172.25.0.0/16
+          aux_address: {"quantum-scraper": "172.25.0.100", "mongodb": "172.25.0.101", "redis": "172.25.0.102", "gdrive-proxy": "172.25.0.103", "token-monitor": "172.25.0.104", "visualization": "172.25.0.105", "system-logger": "172.25.0.106", "adaptive-learner": "172.25.0.107", "reality-shift": "172.25.0.108", "temporal-entanglement": "172.25.0.109", "reality-catalyst": "172.25.0.110", "quantum-orchestrator": "172.25.0.111", "neural-synchrone": "172.25.0.112", "catalyst-ui": "172.25.0.113", "token-budget": "172.25.0.114", "mutation-recovery": "172.25.0.115", "reality-drift": "172.25.0.116", "entanglement-check": "172.25.0.117", "entanglement-mapper": "172.25.0.118", "quantum-reality": "172.25.0.119", "token-distributor": "172.25.0.120", "reality-synchrone": "172.25.0.121", "quantum-entanglement": "172.25.0.122", "entanglement-checker": "172.25.0.123", "reality-collider": "172.25.0.124", "temporal-entanglement": "172.25.0.125", "quantum-orchestrator": "172.25.0.126", "neural-synchrone": "172.25.0.127", "reality-catalyst": "172.25.0.128", "entanglement-mapper": "172.25.0.129", "quantum-reality": "172.25.0.130", "entanglement-checker": "172.25.0.131", "reality-collider": "172.25.0.132", "temporal-entanglement": "172.25.0.133", "quantum-orchestrator": "172.25.0.134", "neural-synchrone": "172.25.0.135", "reality-catalyst": "172.25.0.136", "entanglement-mapper": "172.25.0.137", "quantum-reality": "172.25.0.138", "entanglement-checker": "172.25.0.139", "reality-collider": "172.25.0.140", "temporal-entanglement": "172.25.0.141", "quantum-orchestrator": "172.25.0.142", "neural-synchrone": "172.25.0.143", "reality-catalyst": "172.25.0.144", "entanglement-mapper": "172.25.0.145", "quantum-reality": "172.25.0.146", "entanglement-checker": "172.25.0.147", "reality-collider": "172.25.0.148", "temporal-entanglement": "172.25.0.149", "quantum-orchestrator": "172.25.0.150", "neural-synchrone": "172.25.0.151", "reality-catalyst": "172.25.0.152", "entanglement-mapper": "172.25.0.153", "quantum-reality": "172.25.0.154", "entanglement-checker": "172.25.0.155", "reality-collider": "172.25.0.156", "temporal-entanglement": "172.25.0.157", "quantum-orchestrator": "172.25.0.158", "neural-synchrone": "172.25.0.159", "reality-catalyst": "172.25.0.160", "entanglement-mapper": "172.25.0.161", "quantum-reality": "172.25.0.162", "entanglement-checker": "172.25.0.163", "reality-collider": "172.25.0.164", "temporal-entanglement": "172.25.0.165", "quantum-orchestrator": "172.25.0.166", "neural-synchrone": "172.25.0.167", "reality-catalyst": "172.25.0.168", "entanglement-mapper": "172.25.0.169", "quantum-reality": "172.25.0.170", "entanglement-checker": "172.25.0.171", "reality-collider": "172.25.0.172", "temporal-entanglement": "172.25.0.173", "quantum-orchestrator": "172.25.0.174", "neural-synchrone": "172.25.0.175", "reality-catalyst": "172.25.0.176", "entanglement-mapper": "172.25.0.177", "quantum-reality": "172.25.0.178", "entanglement-checker": "172.25.0.179", "reality-collider": "172.25.0.180", "temporal-entanglement": "172.25.0.181", "quantum-orchestrator": "172.25.0.182", "neural-synchrone": "172.25.0.183", "reality-catalyst": "172.25.0.184", "entanglement-mapper": "172.25.0.185", "quantum-reality": "172.25.0.186", "entanglement-checker": "172.25.0.187", "reality-collider": "172.25.0.188", "temporal-entanglement": "172.25.0.189", "quantum-orchestrator": "172.25.0.190", "neural-synchrone": "172.25.0.191", "reality-catalyst": "172.25.0.192", "entanglement-mapper": "172.25.0.193", "quantum-reality": "172.25.0.194", "entanglement-checker": "172.25.0.195", "reality-collider": "172.25.0.196", "temporal-entanglement": "172.25.0.197", "quantum-orchestrator": "172.25.0.198", "neural-synchrone": "172.25.0.199", "reality-catalyst": "172.25.0.200", "entanglement-mapper": "172.25.0.201", "quantum-reality": "172.25.0.202", "entanglement-checker": "172.25.0.203", "reality-collider": "172.25.0.204", "temporal-entanglement": "172.25.0.205", "quantum-orchestrator": "172.25.0.206", "neural-synchrone": "172.25.0.207", "reality-catalyst": "172.25.0.208", "entanglement-mapper": "172.25.0.209", "quantum-reality": "172.25.0.210", "entanglement-checker": "172.25.0.211", "reality-collider": "172.25.0.212", "temporal-entanglement": "172.25.0.213", "quantum-orchestrator": "172.25.0.214", "neural-synchrone": "172.25.0.215", "reality-catalyst": "172.25.0.216", "entanglement-mapper": "172.25.0.217", "quantum-reality": "172.25.0.218", "entanglement-checker": "172.25.0.219", "reality-collider": "172.25.0.220", "temporal-entanglement": "172.25.0.221", "quantum-orchestrator": "172.25.0.222", "neural-synchrone": "172.25.0.223", "reality-catalyst": "172.25.0.224", "entanglement-mapper": "172.25.0.225", "quantum-reality": "172.25.0.226", "entanglement-checker": "172.25.0.227", "reality-collider": "172.25.0.228", "temporal-entanglement": "172.25.0.229", "quantum-orchestrator": "172.25.0.230", "neural-synchrone": "172.25.0.231", "reality-catalyst": "172.25.0.232", "entanglement-mapper": "172.25.0.233", "quantum-reality": "172.25.0.234", "entanglement-checker": "172.25.0.235", "reality-collider": "172.25.0.236", "temporal-entanglement": "172.25.0.237", "quantum-orchestrator": "172.25.0.238", "neural-synchrone": "172.25.0.239", "reality-catalyst": "172.25.0.240", "entanglement-mapper": "172.25.0.241", "quantum-reality": "172.25.0.242", "entanglement-checker": "172.25.0.243", "reality-collider": "172.25.0.244", "temporal-entanglement": "172.25.0.245", "quantum-orchestrator": "172.25.0.246", "neural-synchrone": "172.25.0.247", "reality-catalyst": "172.25.0.248", "entanglement-mapper": "172.25.0.249", "quantum-reality": "172.25.0.250", "entanglement-checker": "172.25.0.251", "reality-collider": "172.25.0.252", "temporal-entanglement": "172.25.0.253", "quantum-orchestrator": "172.25.0.254", "neural-synchrone": "172.25.0.255", "reality-catalyst": "172.25.0.256", "entanglement-mapper": "172.25.0.257", "quantum-reality": "172.25.0.258", "entanglement-checker": "172.25.0.259", "reality-collider": "172.25.0.260", "temporal-entanglement": "172.25.0.261", "quantum-orchestrator": "172.25.0.262", "neural-synchrone": "172.25.0.263", "reality-catalyst": "172.25.0.264", "entanglement-mapper": "172.25.0.265", "quantum-reality": "172.25.0.266", "entanglement-checker": "172.25.0.267", "reality-collider": "172.25.0.268", "temporal-entanglement": "172.25.0.269", "quantum-orchestrator": "172.25.0.270", "neural-synchrone": "172.25.0.271", "reality-catalyst": "172.25.0.272", "entanglement-mapper": "172.25.0.273", "quantum-reality": "172.25.0.274", "entanglement-checker": "172.25.0.275", "reality-collider": "172.25.0.276", "temporal-entanglement": "172.25.0.277", "quantum-orchestrator": "172.25.0.278", "neural-synchrone": "172.25.0.279", "reality-catalyst": "172.25.0.280", "entanglement-mapper": "172.25.0.281", "quantum-reality": "172.25.0.282", "entanglement-checker": "172.25.0.283", "reality-collider": "172.25.0.284", "temporal-entanglement": "172.25.0.285", "quantum-orchestrator": "172.25.0.286", "neural-synchrone": "172.25.0.287", "reality-catalyst": "172.25.0.288", "entanglement-mapper": "172.25.0.289", "quantum-reality": "172.25.0.290", "entanglement-checker": "172.25.0.291", "reality-collider": "172.25.0.292", "temporal-entanglement": "172.25.0.293", "quantum-orchestrator": "172.25.0.294", "neural-synchrone": "172.25.0.295", "reality-catalyst": "172.25.0.296", "entanglement-mapper": "172.25.0.297", "quantum-reality": "172.25.0.298", "entanglement-checker": "172.25.0.299", "reality-collider": "172.25.0.300", "temporal-entanglement": "172.25.0.301", "quantum-orchestrator": "172.25.0.302", "neural-synchrone": "172.25.0.303", "reality-catalyst": "172.25.0.304", "entanglement-mapper": "172.25.0.305", "quantum-reality": "172.25.0.306", "entanglement-checker": "172.25.0.307", "reality-collider": "172.25.0.308", "temporal-entanglement": "172.25.0.309", "quantum-orchestrator": "172.25.0.310", "neural-synchrone": "172.25.0.311", "reality-catalyst": "172.25.0.312", "entanglement-mapper": "172.25.0.313", "quantum-reality": "172.25.0.314", "entanglement-checker": "172.25.0.315", "reality-collider": "172.25.0.316", "temporal-entanglement": "172.25.0.317", "quantum-orchestrator": "172.25.0.318", "neural-synchrone": "172.25.0.319", "reality-catalyst": "172.25.0.320", "entanglement-mapper": "172.25.0.321", "quantum-reality": "172.25.0.322", "entanglement-checker": "172.25.0.323", "reality-collider": "172.25.0.324", "temporal-entanglement": "172.25.0.325", "quantum-orchestrator": "172.25.0.326", "neural-synchrone": "172.25.0.327", "reality-catalyst": "172.25.0.328", "entanglement-mapper": "172.25.0.329", "quantum-reality": "172.25.0.330", "entanglement-checker": "172.25.0.331", "reality-collider": "172.25.0.332", "temporal-entanglement": "172.25.0.333", "quantum-orchestrator": "172.25.0.334", "neural-synchrone": "172.25.0.335", "reality-catalyst": "172.25.0.336", "entanglement-mapper": "172.25.0.337", "quantum-reality": "172.25.0.338", "entanglement-checker": "172.25.0.339", "reality-collider": "172.25.0.340", "temporal-entanglement": "172.25.0.341", "quantum-orchestrator": "172.25.0.342", "neural-synchrone": "172.25.0.343", "reality-catalyst": "172.25.0.344", "entanglement-mapper": "172.25.0.345", "quantum-reality": "172.25.0.346", "entanglement-checker": "172.25.0.347", "reality-collider": "172.25.0.348", "temporal-entanglement": "172.25.0.349", "quantum-orchestrator": "172.25.0.350", "neural-synchrone": "172.25.0.351", "reality-catalyst": "172.25.0.352", "entanglement-mapper": "172.25.0.353", "quantum-reality": "172.25.0.354", "entanglement-checker": "172.25.0.355", "reality-collider": "172.25.0.356", "temporal-entanglement": "172.25.0.357", "quantum-orchestrator": "172.25.0.358", "neural-synchrone": "172.25.0.359", "reality-catalyst": "172.25.0.360", "entanglement-mapper": "172.25.0.361", "quantum-reality": "172.25.0.362", "entanglement-checker": "172.25.0.363", "reality-collider": "172.25.0.364", "temporal-entanglement": "172.25.0.365", "quantum-orchestrator": "172.25.0.366", "neural-synchrone": "172.25.0.367", "reality-catalyst": "172.25.0.368", "entanglement-mapper": "172.25.0.369", "quantum-reality": "172.25.0.370", "entanglement-checker": "172.25.0.371", "reality-collider": "172.25.0.372", "temporal-entanglement": "172.25.0.373", "quantum-orchestrator": "172.25.0.374", "neural-synchrone": "172.25.0.375", "reality-catalyst": "172.25.0.376", "entanglement-mapper": "172.25.0.377", "quantum-reality": "172.25.0.378", "entanglement-checker": "172.25.0.379", "reality-collider": "172.25.0.380", "temporal-entanglement": "172.25.0.381", "quantum-orchestrator": "172.25.0.382", "neural-synchrone": "172.25.0.383", "reality-catalyst": "172.25.0.384", "entanglement-mapper": "172.25.0.385", "quantum-reality": "172.25.0.386", "entanglement-checker": "172.25.0.387", "reality-collider": "172.25.0.388", "temporal-entanglement": "172.25.0.389", "quantum-orchestrator": "172.25.0.390", "neural-synchrone": "172.25.0.391", "reality-catalyst": "172.25.0.392", "entanglement-mapper": "172.25.0.393", "quantum-reality": "172.25.0.394", "entanglement-checker": "172.25.0.395", "reality-collider": "172.25.0.396", "temporal-entanglement": "172.25.0.397", "quantum-orchestrator": "172.25.0.398", "neural-synchrone": "172.25.0.399", "reality-catalyst": "172.25.0.400", "entanglement-mapper": "172.25.0.401", "quantum-reality": "172.25.0.402", "entanglement-checker": "172.25.0.403", "reality-collider": "172.25.0.404", "temporal-entanglement": "172.25.0.405", "quantum-orchestrator": "172.25.0.406", "neural-synchrone": "172.25.0.407", "reality-catalyst": "172.25.0.408", "entanglement-mapper": "172.25.0.409", "quantum-reality": "172.25.0.410", "entanglement-checker": "172.25.0.411", "reality-collider": "172.25.0.412", "temporal-entanglement": "172.25.0.413", "quantum-orchestrator": "172.25.0.414", "neural-synchrone": "172.25.0.415", "reality-catalyst": "172.25.0.416", "entanglement-mapper": "172.25.0.417", "quantum-reality": "172.25.0.418", "entanglement-checker": "172.25.0.419", "reality-collider": "172.25.0.420", "temporal-entanglement": "172.25.0.421", "quantum-orchestrator": "172.25.0.422", "neural-synchrone": "172.25.0.423", "reality-catalyst": "172.25.0.424", "entanglement-mapper": "172.25.0.425", "quantum-reality": "172.25.0.426", "entanglement-checker": "172.25.0.427", "reality-collider": "172.25.0.428", "temporal-entanglement": "172.25.0.429", "quantum-orchestrator": "172.25.0.430", "neural-synchrone": "172.25.0.431", "reality-catalyst": "172.25.0.432", "entanglement-mapper": "172.25.0.433", "quantum-reality": "172.25.0.434", "entanglement-checker": "172.25.0.435", "reality-collider": "172.25.0.436", "temporal-entanglement": "172.25.0.437", "quantum-orchestrator": "172.25.0.438", "neural-synchrone": "172.25.0.439", "reality-catalyst": "172.25.0.440", "entanglement-mapper": "172.25.0.441", "quantum-reality": "172.25.0.442", "entanglement-checker": "172.25.0.443", "reality-collider": "172.25.0.444", "temporal-entanglement": "172.25.0.445", "quantum-orchestrator": "172.25.0.446", "neural-synchrone": "172.25.0.447", "reality-catalyst": "172.25.0.448", "entanglement-mapper": "172.25.0.449", "quantum-reality": "172.25.0.450", "entanglement-checker": "172.25.0.451", "reality-collider": "172.25.0.452", "temporal-entanglement": "172.25.0.453", "quantum-orchestrator": "172.25.0.454", "neural-synchrone": "172.25.0.455", "reality-catalyst": "172.25.0.456", "entanglement-mapper": "172.25.0.457", "quantum-reality": "172.25.0.458", "entanglement-checker": "172.25.0.459", "reality-collider": "172.25.0.460", "temporal-entanglement": "172.25.0.461", "quantum-orchestrator": "172.25.0.462", "neural-synchrone": "172.25.0.463", "reality-catalyst": "172.25.0.464", "entanglement-mapper": "172.25.0.465", "quantum-reality:172.25.0.466", "entanglement-checker:172.25.0.467", "reality-collider:172.25.0.468", "temporal-entanglement:172.25.0.469", "quantum-orchestrator:172.25.0.470", "neural-synchrone:172.25.0.471", "reality-catalyst:172.25.0.472", "entanglement-mapper:172.25.0.473", "quantum-reality:172.25.0.474", "entanglement-checker:172.25.0.475", "reality-collider:172.25.0.476", "temporal-entanglement:172.25.0.477", "quantum-orchestrator:172.25.0.478", "neural-synchrone:172.25.0.479", "reality-catalyst:172.25.0.480", "entanglement-mapper:172.25.0.481", "quantum-reality:172.25.0.482", "entanglement-checker:172.25.0.483", "reality-collider:172.25.0.484", "temporal-entanglement:172.25.0.485", "quantum-orchestrator:172.25.0.486", "neural-synchrone:172.25.0.487", "reality-catalyst:172.25.0.488", "entanglement-mapper:172.25.0.489", "quantum-reality:172.25.0.490", "entanglement-checker:172.25.0.491", "reality-collider:172.25.0.492", "temporal-entanglement:172.25.0.493", "quantum-orchestrator:172.25.0.494", "neural-synchrone:172.25.0.495", "reality-catalyst:172.25.0.496", "entanglement-mapper:172.25.0.497", "quantum-reality:172.25.0.498", "entanglement-checker:172.25.0.499", "reality-collider:172.25.0.500", "temporal-entanglement:172.25.0.501", "quantum-orchestrator:172.25.0.502", "neural-synchrone:172.25.0.503", "reality-catalyst:172.25.0.504", "entanglement-mapper:172.25.0.505", "quantum-reality:172.25.0.506", "entanglement-checker:172.25.0.507", "reality-collider:172.25.0.508", "temporal-entanglement:172.25.0.509", "quantum-orchestrator:172.25.0.510", "neural-synchrone:172.25.0.511", "reality-catalyst:172.25.0.512", "entanglement-mapper:172.25.0.513", "quantum-reality:172.25.0.514", "entanglement-checker:172.25.0.515", "reality-collider:172.25.0.516", "temporal-entanglement:172.25.0.517", "quantum-orchestrator:172.25.0.518", "neural-synchrone:172.25.0.519", "reality-catalyst:172.25.0.520", "entanglement-mapper:172.25.0.521", "quantum-reality:172.25.0.522", "entanglement-checker:172.25.0.523", "reality-collider:172.25.0.524", "temporal-entanglement:172.25.0.525", "quantum-orchestrator:172.25.0.526", "neural-synchrone:172.25.0.527", "reality-catalyst:172.25.0.528", "entanglement-mapper:172.25.0.529", "quantum-reality:172.25.0.530", "entanglement-checker:172.25.0.531", "reality-collider:172.25.0.532", "temporal-entanglement:172.25.0.533", "quantum-orchestrator:172.25.0.534", "neural-synchrone:172.25.0.535", "reality-catalyst:172.25.0.536", "entanglement-mapper:172.25.0.537", "quantum-reality:172.25.0.538", "entanglement-checker:172.25.0.539", "reality-collider:172.25.0.540", "temporal-entanglement:172.25.0.541", "quantum-orchestrator:172.25.0.542", "neural-synchrone:172.25.0.543", "reality-catalyst:172.25.0.544", "entanglement-mapper:172.25.0.545", "quantum-reality:172.25.0.546", "entanglement-checker:172.25.0.547", "reality-collider:172.25.0.548", "temporal-entanglement:172.25.0.549", "quantum-orchestrator:172.25.0.550", "neural-synchrone:172.25.0.551", "reality-catalyst:172.25.0.552", "entanglement-mapper:172.25.0.553", "quantum-reality:172.25.0.554", "entanglement-checker:172.25.0.555", "reality-collider:172.25.0.556", "temporal-entanglement:172.25.0.557", "quantum-orchestrator:172.25.0.558", "neural-synchrone:172.25.0.559", "reality-catalyst:172.25.0.560", "entanglement-mapper:172.25.0.561", "quantum-reality:172.25.0.562", "entanglement-checker:172.25.0.563", "reality-collider:172.25.0.564", "temporal-entanglement:172.25.0.565", "quantum-orchestrator:172.25.0.566", "neural-synchrone:172.25.0.567", "reality-catalyst:172.25.0.568", "entanglement-mapper:172.25.0.569", "quantum-reality:172.25.0.570", "entanglement-checker:172.25.0.571", "reality-collider:172.25.0.572", "temporal-entanglement:172.25.0.573", "quantum-orchestrator:172.25.0.574", "neural-synchrone:172.25.0.575", "reality-catalyst:172.25.0.576", "entanglement-mapper:172.25.0.577", "quantum-reality:172.25.0.578", "entanglement-checker:172.25.0.579", "reality-collider:172.25.0.580", "temporal-entanglement:172.25.0.581", "quantum-orchestrator:172.25.0.582", "neural-synchrone:172.25.0.583", "reality-catalyst:172.25.0.584", "entanglement-mapper:172.25.0.585", "quantum-reality:172.25.0.586", "entanglement-checker:172.25.0.587", "reality-collider:172.25.0.588", "temporal-entanglement:172.25.0.589", "quantum-orchestrator:172.25.0.590", "neural-synchrone:172.25.0.591", "reality-catalyst:172.25.0.592", "entanglement-mapper:172.25.0.593", "quantum-reality:172.25.0.594", "entanglement-checker:172.25.0.595", "reality-collider:172.25.0.596", "entanglement-mapper:172.25.0.597", "quantum-reality:172.25.0.598", "entanglement-checker:172.25.0.599", "reality-collider:172.25.0.600", "temporal-entanglement:172.25.0.601", "quantum-orchestrator:172.25.0.602", "neural-synchrone:172.25.0.603", "reality-catalyst:172.25.0.604", "entanglement-mapper:172.25.0.605", "quantum-reality:172.25.0.606", "entanglement-checker:172.25.0.607", "reality-collider:172.25.0.608", "temporal-entanglement:172.25.0.609", "quantum-orchestrator:172.25.0.610", "neural-synchrone:172.25.0.611", "reality-catalyst:172.25.0.612", "entanglement-mapper:172.25.0.613", "quantum-reality:172.25.0.614", "entanglement-checker:172.25.0.615", "reality-collider:172.25.0.616", "temporal-entanglement:172.25.0.617", "quantum-orchestrator:172.25.0.618", "neural-synchrone:172.25.0.619", "reality-catalyst:172.25.0.620", "entanglement-mapper:172.25.0.621", "quantum-reality:172.25.0.622", "entanglement-checker:172.25.0.623", "reality-collider:172.25.0.624", "temporal-entanglement:172.25.0.625", "quantum-orchestrator:172.25.0.626", "neural-synchrone:172.25.0.627", "reality-collider:172.25.0.628", "entanglement-mapper:172.25.0.629", "quantum-reality:172.25.0.630", "entanglement-checker:172.25.0.631", "reality-collider:172.25.0.632", "temporal-entanglement:172.25.0.633", "quantum-orchestrator:172.25.0.634", "neural-synchrone:172.25.0.635", "reality-collider:172.25.0.636", "entanglement-mapper:172.25.0.637", "quantum-reality:172.25.0.638", "entanglement-checker:172.25.0.639", "reality-collider:172.25.0.640", "temporal-entanglement:172.25.0.641", "quantum-orchestrator:172.25.0.642", "neural-synchrone:172.25.0.643", "reality-collider:172.25.0.644", "entanglement-mapper:172.25.0.645", "quantum-reality:172.25.0.646", "entanglement-checker:172.25.0.647", "reality-collider:172.25.0.648", "entanglement-mapper:172.25.0.649", "quantum-reality:172.25.0.650", "entanglement-checker:172.25.0.651", "reality-collider:172.25.0.652", "entanglement-mapper:172.25.0.653", "quantum-reality:172.25.0.654", "entanglement-checker:172.25.0.655", "reality-collider:172.25.0.656", "entanglement-mapper:172.25.0.657", "quantum-reality:172.25.0.658", "entanglement-checker:172.25.0.659", "reality-collider:172.25.0.660", "entanglement-mapper:172.25.0.661", "quantum-reality:172.25.0.662", "entanglement-checker:172.25.0.663", "reality-collider:172.25.0.664", "entanglement-mapper:172.25.0.665", "quantum-reality:172.25.0.666", "entanglement-checker:172.25.0.667", "reality-collider:172.25.0.668", "entanglement-mapper:172.25.0.669", "quantum-reality:172.25.0.670", "entanglement-checker:172.25.0.671", "reality-collider:172.25.0.672", "entanglement-mapper:172.25.0.673", "quantum-reality:172.25.0.674", "entanglement-checker:172.25.0.675", "reality-collider:172.25.0.676", "entanglement-mapper:172.25.0.677", "quantum-reality:172.25.0.678", "entanglement-checker:172.25.0.679", "reality-collider:172.25.0.680", "entanglement-mapper:172.25.0.681", "quantum-reality:172.25.0.682", "entanglement-checker:172.25.0.683", "reality-collider:172.25.0.684", "entanglement-mapper:172.25.0.685", "quantum-reality:172.25.0.686", "entanglement-checker:172.25.0.687", "reality-collider:172.25.0.688", "entanglement-mapper:172.25.0.689", "quantum-reality:172.25.0.690", "entanglement-checker:172.25.0.691", "reality-collider:172.25.0.692", "entanglement-mapper:172.25.0.693", "quantum-reality:172.25.0.694", "entanglement-checker:172.25.0.695", "reality-collider:172.25.0.696", "entanglement-mapper:172.25.0.697", "quantum-reality:172.25.0.698", "entanglement-checker:172.25.0.699", "reality-collider:172.25.0.700", "entanglement-mapper:172.25.0.701", "quantum-reality:172.25.0.702", "entanglement-checker:172.25.0.703", "reality-collider:172.25.0.704", "entanglement-mapper:172.25.0.705", "quantum-reality:172.25.0.706", "entanglement-checker:172.25.0.707", "reality-collider:172.25.0.708", "entanglement-mapper:172.25.0.709", "quantum-reality:172.25.0.710", "entanglement-checker:172.25.0.711", "reality-collider:172.25.0.712", "entanglement-mapper:172.25.0.713", "quantum-reality:172.25.0.714", "entanglement-checker:172.25.0.715", "reality-collider:172.25.0.716", "entanglement-mapper:172.25.0.717", "quantum-reality:172.25.0.718", "entanglement-checker:172.25.0.719", "reality-collider:172.25.0.720", "entanglement-mapper:172.25.0.721", "quantum-reality:172.25.0.722", "entanglement-checker:172.25.0.723", "reality-collider:172.25.0.724", "entanglement-mapper:172.25.0.725", "quantum-reality:172.25.0.726", "entanglement-checker:172.25.0.727", "reality-collider:172.25.0.728", "entanglement-mapper:172.25.0.729", "quantum-reality:172.25.0.730", "entanglement-checker:172.25.0.731", "reality-collider:172.25.0.732", "entanglement-mapper:172.25.0.733", "quantum-reality:172.25.0.734", "entanglement-checker:172.25.0.735", "reality-collider:172.25.0.736", "entanglement-mapper:172.25.0.737", "quantum-reality:172.25.0.738", "entanglement-checker:172.25.0.739", "reality-collider:172.25.0.740", "entanglement-mapper:172.25.0.741", "quantum-reality:172.25.0.742", "entanglement-checker:172.25.0.743", "reality-collider:172.25.0.744", "entanglement-mapper:172.25.0.745", "quantum-reality:172.25.0.746", "entanglement-checker:172.25.0.747", "reality-collider:172.25.0.748", "entanglement-mapper:172.25.0.749", "quantum-reality:172.25.0.750", "entanglement-checker:172.25.0.751", "reality-collider:172.25.0.752", "entanglement-mapper:172.25.0.753", "quantum-reality:172.25.0.754", "entanglement-checker:172.25.0.755", "reality-collider:172.25.0.756", "entanglement-mapper:172.25.0.757", "quantum-reality:172.25.0.758", "entanglement-checker:172.25.0.759", "reality-collider:172.25.0.760", "entanglement-mapper:172.25.0.761", "quantum-reality:172.25.0.762", "entanglement-checker:172.25.0.763", "reality-collider:172.25.0.764", "entanglement-mapper:172.25.0.765", "quantum-reality:172.25.0.766", "entanglement-checker:172.25.0.767", "reality-collider:172.25.0.768", "entanglement-mapper:172.25.0.769", "quantum-reality:172.25.0.770", "entanglement-checker:172.25.0.771", "reality-collider:172.25.0.772", "entanglement-mapper:172.25.0.773", "quantum-reality:172.25.0.774", "entanglement-checker:172.25.0.775", "reality-collider:172.25.0.776", "entanglement-mapper:172.25.0.777", "quantum-reality:172.25.0.778", "entanglement-checker:172.25.0.779", "reality-collider:172.25.0.780", "entanglement-mapper:172.25.0.781", "quantum-reality:172.25.0.782", "entanglement-checker:172.25.0.783", "reality-collider:172.25.0.784", "entanglement-mapper:172.25.0.785", "quantum-reality:172.25.0.786", "entanglement-checker:172.25.0.787", "reality-collider:172.25.0.788", "entanglement-mapper:172.25.0.789", "quantum-reality:172.25.0.790", "entanglement-checker:172.25.0.791", "reality-collider:172.25.0.792", "entanglement-mapper:172.25.0.793", "quantum-reality:172.25.0.794", "entanglement-checker:172.25.0.795", "reality-collider:172.25.0.796", "entanglement-mapper:172.25.0.797", "quantum-reality:172.25.0.798", "entanglement-checker:172.25.0.799", "reality-collider:172.25.0.800", "entanglement-mapper:172.25.0.801", "quantum-reality:172.25.0.802", "entanglement-checker:172.25.0.803", "reality-collider:172.25.0.804", "entanglement-mapper:172.25.0.805", "quantum-reality:172.25.0.806", "entanglement-checker:172.25.0.807", "reality-collider:172.25.0.808", "entanglement-mapper:172.25.0.809", "quantum-reality:172.25.0.810", "entanglement-checker:172.25.0.811", "reality-collider:172.25.0.812", "entanglement-mapper:172.25.0.813", "quantum-reality:172.25.0.814", "entanglement-checker:172.25.0.815", "reality-collider:172.25.0.816", "entanglement-mapper:172.25.0.817", "quantum-reality:172.25.0.818", "entanglement-checker:172.25.0.819", "reality-collider:172.25.0.820", "entanglement-mapper:172.25.0.821", "quantum-reality:172.25.0.822", "entanglement-checker:172.25.0.823", "reality-collider:172.25.0.824", "entanglement-mapper:172.25.0.825", "quantum-reality:172.25.0.826", "entanglement-checker:172.25.0.827", "reality-collider:172.25.0.828", "entanglement-mapper:172.25.0.829", "quantum-reality:172.25.0.830", "entanglement-checker:172.25.0.831", "reality-collider:172.25.0.832", "entanglement-mapper:172.25.0.833", "quantum-reality:172.25.0.834", "entanglement-checker:172.25.0.835", "reality-collider:172.25.0.836", "entanglement-mapper:172.25.0.837", "quantum-reality:172.25.0.838", "entanglement-checker:172.25.0.839", "reality-collider:172.25.0.840", "entanglement-mapper:172.25.0.841", "quantum-reality:172.25.0.842", "entanglement-checker:172.25.0.843", "reality-collider:172.25.0.844", "entanglement-mapper:172.25.0.845", "quantum-reality:172.25.0.846", "entanglement-checker:172.25.0.847", "reality-collider:172.25.0.848", "entanglement-mapper:172.25.0.849", "quantum-reality:172.25.0.850", "entanglement-checker:172.25.0.851", "reality-collider:172.25.0.852", "entanglement-mapper:172.25.0.853", "quantum-reality:172.25.0.854", "entanglement-checker:172.25.0.855", "reality-collider:172.25.0.856", "entanglement-mapper:172.25.0.857", "quantum-reality:172.25.0.858", "entanglement-checker:172.25.0.859", "reality-collider:172.25.0.860", "entanglement-mapper:172.25.0.861", "quantum-reality:172.25.0.862", "entanglement-checker:172.25.0.863", "reality-collider:172.25.0.864", "entanglement-mapper:172.25.0.865", "quantum-reality:172.25.0.866", "entanglement-checker:172.25.0.867", "reality-collider:172.25.0.868", "entanglement-mapper:172.25.0.869", "quantum-reality:172.25.0.870", "entanglement-checker:172.25.0.871", "reality-collider:172.25.0.872", "entanglement-mapper:172.25.0.873", "quantum-reality:172.25.0.874", "entanglement-checker:172.25.0.875", "reality-collider:172.25.0.876", "entanglement-mapper:172.25.0.877", "quantum-reality:172.25.0.878", "entanglement-checker:172.25.0.879", "reality-collider:172.25.0.880", "entanglement-mapper:172.25.0.881", "quantum-reality:172.25.0.882", "entanglement-checker:172.25.0.883", "reality-collider:172.25.0.884", "entanglement-mapper:172.25.0.885", "quantum-reality:172.25.0.886", "entanglement-checker:172.25.0.887", "reality-collider:172.25.0.888", "entanglement-mapper:172.25.0.889", "quantum-reality:172.25.0.890", "entanglement-checker:172.25.0.891", "reality-collider:172.25.0.892", "entanglement-mapper:172.25.0.893", "quantum-reality:172.25.0.894", "entanglement-checker:172.25.0.895", "reality-collider:172.25.0.896", "entanglement-mapper:172.25.0.897", "quantum-reality:172.25.0.898", "entanglement-checker:172.25.0.899", "reality-collider:172.25.0.900", "entanglement-mapper:172.25.0.901", "quantum-reality:172.25.0.902", "entanglement-checker:172.25.0.903", "reality-collider:172.25.0.904", "entanglement-mapper:172.25.0.905", "quantum-reality:172.25.0.906", "entanglement-checker:172.25.0.907", "reality-collider:172.25.0.908", "entanglement-mapper:172.25.0.909", "quantum-reality:172.25.0.910", "entanglement-checker:172.25.0.911", "reality-collider:172.25.0.912", "entanglement-mapper:172.25.0.913", "quantum-reality:172.25.0.914", "entanglement-checker:172.25.0.915", "reality-collider:172.25.0.916", "entanglement-mapper:172.25.0.917", "quantum-reality:172.25.0.918", "entanglement-checker:172.25.0.919", "reality-collider:172.25.0.920", "entanglement-mapper:172.25.0.921", "quantum-reality:172.25.0.922", "entanglement-checker:172.25.0.923", "reality-collider:172.25.0.924", "entanglement-mapper:172.25.0.925", "quantum-reality:172.25.0.926", "entanglement-checker:172.25.0.927", "reality-collider:172.25.0.928", "entanglement-mapper:172.25.0.929", "quantum-reality:172.25.0.930", "entanglement-checker:172.25.0.931", "reality-collider:172.25.0.932", "entanglement-mapper:172.25.0.933", "quantum-reality:172.25.0.934", "entanglement-checker:172.25.0.935", "reality-collider:172.25.0.936", "entanglement-mapper:172.25.0.937", "quantum-reality:172.25.0.938", "entanglement-checker:172.25.0.939", "reality-collider:172.25.0.940", "entanglement-mapper:172.25.0.941", "quantum-reality:172.25.0.942", "entanglement-checker:172.25.0.943", "reality-collider:172.25.0.944", "entanglement-mapper:172.25.0.945", "quantum-reality:172.25.0.946", "entanglement-checker:172.25.0.947", "reality-collider:172.25.0.948", "entanglement-mapper:172.25.0.949", "quantum-reality:172.25.0.950", "entanglement-checker:172.25.0.951", "reality-collider:172.25.0.952", "entanglement-mapper:172.25.0.953", "quantum-reality:172.25.0.954", "entanglement-checker:172.25.0.955", "reality-collider:172.25.0.956", "entanglement-mapper:172.25.0.957", "quantum-reality:172.25.0.958", "entanglement-checker:172.25.0.959", "reality-collider:172.25.0.960", "entanglement-mapper:172.25.0.961", "quantum-reality:172.25.0.962", "entanglement-checker:172.25.0.963", "reality-collider:172.25.0.964", "entanglement-mapper:172.25.0.965", "quantum-reality:172.25.0.966", "entanglement-checker:172.25.0.967", "reality-collider:172.25.0.968", "entanglement-mapper:172.25.0.969", "quantum-reality:172.25.0.970", "entanglement-checker:172.25.0.971", "reality-collider:172.25.0.972", "entanglement-mapper:172.25.0.973", "quantum-reality:172.25.0.974", "entanglement-checker:172.25.0.975", "reality-collider:172.25.0.976", "entanglement-mapper:172.25.0.977", "quantum-reality:172.25.0.978", "entanglement-checker:172.25.0.979", "reality-collider:172.25.0.980", "entanglement-mapper:172.25.0.981", "quantum-reality:172.25.0.982", "entanglement-checker:172.25.0.983", "reality-collider:172.25.0.984", "entanglement-mapper:172.25.0.985", "quantum-reality:172.25.0.986", "entanglement-checker:172.25.0.987", "reality-collider:172.25.0.988", "entanglement-mapper:172.25.0.989", "quantum-reality:172.25.0.990", "entanglement-checker:172.25.0.991", "reality-collider:172.25.0.992", "entanglement-mapper:172.25.0.993", "quantum-reality:172.25.0.994", "entanglement-checker:172.25.0.995", "reality-collider:172.25.0.996", "entanglement-mapper:172.25.0.997", "quantum-reality:172.25.0.998", "entanglement-checker:172.25.0.999", "reality-collider:172.25.0.1000", "entanglement-mapper:172.25.0.1001", "quantum-reality:172.25.0.1002", "entanglement-checker:172.25.0.1003", "reality-collider:172.25.0.1004", "entanglement-mapper:172.25.0.1005", "quantum-reality:172.25.0.1006", "entanglement-checker:172.25.0.1007", "reality-collider:172.25.0.1008", "entanglement-mapper:172.25.0.1009", "quantum-reality:172.25.0.1010", "entanglement-checker:172.25.0.1011", "reality-collider:172.25.0.1012", "entanglement-mapper:172.25.0.1013", "quantum-reality:172.25.0.1014", "entanglement-checker:172.25.0.1015", "reality-collider:172.25.0.1016", "entanglement-mapper:172.25.0.1017", "quantum-reality:172.25.0.1018", "entanglement-checker:172.25.0.1019", "reality-collider:172.25.0.1020", "entanglement-mapper:172.25.0.1021", "quantum-reality:172.25.0.1022", "entanglement-checker:172.25.0.1023", "reality-collider:172.25.0.1024", "entanglement-mapper:172.25.0.1025", "quantum-reality:172.25.0.1026", "entanglement-checker:172.25.0.1027", "reality-collider:172.25.0.1028", "entanglement-mapper:172.25.0.1029", "quantum-reality:172.25.0.1030", "entanglement-checker:172.25.0.1031", "reality-collider:172.25.0.1032", "entanglement-mapper:172.25.0.1033", "quantum-reality:172.25.0.1034", "entanglement-checker:172.25.0.1035", "reality-collider:172.25.0.1036", "entanglement-mapper:172.25.0.1037", "quantum-reality:172.25.0.1038", "entanglement-checker:172.25.0.1039", "reality-collider:172.25.0.1040", "entanglement-mapper:172.25.0.1041", "quantum-reality:172.25.0.1042", "entanglement-checker:172.25.0.1043", "reality-collider:172.25.0.1044", "entanglement-mapper:172.25.0.1045", "quantum-reality:172.25.0.1046", "entanglement-checker:172.25.0.1047", "reality-collider:172.25.0.1048", "entanglement-mapper:172.25.0.1049", "quantum-reality:172.25.0.1050", "entanglement-checker:172.25.0.1051", "reality-collider:172.25.0.1052", "entanglement-mapper:172.25.0.1053", "quantum-reality:172.25.0.1054", "entanglement-checker:172.25.0.1055", "reality-collider:172.25.0.1056", "entanglement-mapper:172.25.0.1057", "quantum-reality:172.25.0.1058", "entanglement-checker:172.25.0.1059", "reality-collider:172.25.0.1060", "entanglement-mapper:172.25.0.1061", "quantum-reality:172.25.0.1062", "entanglement-checker:172.25.0.1063", "reality-collider:172.25.0.1064", "entanglement-mapper:172.25.0.1065", "quantum-reality:172.25.0.1066", "entanglement-checker:172.25.0.1067", "reality-collider:172.25.0.1068", "entanglement-mapper:172.25.0.1069", "quantum-reality:172.25.0.1070", "entanglement-checker:172.25.0.1071", "reality-collider:172.25.0.1072", "entanglement-mapper:172.25.0.1073", "quantum-reality:172.25.0.1074", "entanglement-checker:172.25.0.1075", "reality-collider:172.25.0.1076", "entanglement-mapper:172.25.0.1077", "quantum-reality:172.25.0.1078", "entanglement-checker:172.25.0.1079", "reality-collider:172.25.0.1080", "entanglement-mapper:172.25.0.1081", "quantum-reality:172.25.0.1082", "entanglement-checker:172.25.0.1083", "reality-collider:172.25.0.1084", "entanglement-mapper:172.25.0.1085", "quantum-reality:172.25.0.1086", "entanglement-checker:172.25.0.1087", "reality-collider:172.25.0.1088", "entanglement-mapper:172.25.0.1089", "quantum-reality:172.25.0.1090", "entanglement-checker:172.25.0.1091", "reality-collider:172.25.0.1092", "entanglement-mapper:172.25.0.1093", "quantum-reality:172.25.0.1094", "entanglement-checker:172.25.0.1095", "reality-collider:172.25.0.1096", "entanglement-mapper:172.25.0.1097", "quantum-reality:172.25.0.1098", "entanglement-checker:172.25.0.1099", "reality-collider:172.25.0.1100", "entanglement-mapper:172.25.0.1101", "quantum-reality:172.25.0.1102", "entanglement-checker:172.25.0.1103", "reality-collider:172.25.0.1104", "entanglement-mapper:172.25.0.1105", "quantum-reality:172.25.0.1106", "entanglement-checker:172.25.0.1107", "reality-collider:172.25.0.1108", "entanglement-mapper:172.25.0.1109", "quantum-reality:172.25.0.1110", "entanglement-checker:172.25.0.1111", "reality-collider:172.25.0.1112", "entanglement-mapper:172.25.0.1113", "quantum-reality:172.25.0.1114", "entanglement-checker:172.25.0.1115", "reality-collider:172.25.0.1116", "entanglement-mapper:172.25.0.1117", "quantum-reality:172.25.0.1118", "entanglement-checker:172.25.0.1119", "reality-collider:172.25.0.1120", "entanglement-mapper:172.25.0.1121", "quantum-reality:172.25.0.1122", "entanglement-checker:172.25.0.1123", "reality-collider:172.25.0.1124", "entanglement-mapper:172.25.0.1125", "quantum-reality:172.25.0.1126", "entanglement-checker:172.25.0.1127", "reality-collider:172.25.0.1128", "entanglement-mapper:172.25.0.1129", "quantum-reality:172.25.0.1130", "entanglement-checker:172.25.0.1131", "reality-collider:172.25.0.1132", "entanglement-mapper:172.25.0.1133", "quantum-reality:172.25.0.1134", "entanglement-checker:172.25.0.1135", "reality-collider:172.25.0.1136", "entanglement-mapper:172.25.0.1137", "quantum-reality:172.25.0.1138", "entanglement-checker:172.25.0.1139", "reality-collider:172.25.0.1140", "entanglement-mapper:172.25.0.1141", "quantum-reality:172.25.0.1142", "entanglement-checker:172.25.0.1143", "reality-collider:172.25.0.1144", "entanglement-mapper:172.25.0.1145", "quantum-reality:172.25.0.1146", "entanglement-checker:172.25.0.1147", "reality-collider:172.25.0.1148", "entanglement-mapper:172.25.0.1149", "quantum-reality:172.25.0.1150", "entanglement-checker:172.25.0.1151", "reality-collider:172.25.0.1152", "entanglement-mapper:172.25.0.1153", "quantum-reality:172.25.0.1154", "entanglement-checker:172.25.0.1155", "reality-collider:172.25.0.1156", "entanglement-mapper:172.25.0.1157", "quantum-reality:172.25.0.1158", "entanglement-checker:172.25.0.1159", "reality-collider:172.25.0.1160", "entanglement-mapper:172.25.0.1161", "quantum-reality:172.25.0.1162", "entanglement-checker:172.25.0.1163", "reality-collider:172.25.0.1164", "entanglement-mapper:172.25.0.1165", "quantum-reality:172.25.0.1166", "entanglement-checker:172.25.0.1167", "reality-collider:172.25.0.1168", "entanglement-mapper:172.25.0.1169", "quantum-reality:172.25.0.1170", "entanglement-checker:172.25.0.1171", "reality-collider:172.25.0.1172", "entanglement-mapper:172.25.0.1173", "quantum-reality:172.25.0.1174", "entanglement-checker:172.25.0.1175", "reality-collider:172.25.0.1176", "entanglement-mapper:172.25.0.1177", "quantum-reality:172.25.0.1178", "entanglement-checker:172.25.0.1179", "reality-collider:172.25.0.1180", "entanglement-mapper:172.25.0.1181", "quantum-reality:172.25.0.1182", "entanglement-checker:172.25.0.1183", "reality-collider:172.25.0.1184", "entanglement-mapper:172.25.0.1185", "quantum-reality:172.25.0.1186", "entanglement-checker:172.25.0.1187", "reality-collider:172.25.0.1188", "entanglement-mapper:172.25.0.1189", "quantum-reality:172.25.0.1190", "entanglement-checker:172.25.0.1191", "reality-collider:172.25.0.1192", "entanglement-mapper:172.25.0.1193", "quantum-reality:172.25.0.1194", "entanglement-checker:172.25.0.1195", "reality-collider:172.25.0.1196", "entanglement-mapper:172.25.0.1197", "quantum-reality:172.25.0.1198", "entanglement-checker:172.25.0.1199", "reality-collider:172.25.0.1200", "entanglement-mapper:172.25.0.1201", "quantum-reality:172.25.0.1202", "entanglement-checker:172.25.0.1203", "reality-collider:172.25.0.1204", "entanglement-mapper:172.25.0.1205", "quantum-reality:172.25.0.1206", "entanglement-checker:172.25.0.1207", "reality-collider:172.25.0.1208", "entanglement-mapper:172.25.0.1209", "quantum-reality:172.25.0.1210", "entanglement-checker:172.25.0.1211", "reality-collider:172.25.0.1212", "entanglement-mapper:172.25.0.1213", "quantum-reality:172.25.0.1214", "entanglement-checker:172.25.0.1215", "reality-collider:172.25.0.1216", "entanglement-mapper:172.25.0.1217", "quantum-reality:172.25.0.1218", "entanglement-checker:172.25.0.1219", "reality-collider:172.25.0.1220", "entanglement-mapper:172.2
