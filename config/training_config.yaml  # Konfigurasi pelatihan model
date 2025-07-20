@@ -1,0 +1,4729 @@
+Berikut implementasi lengkap untuk file `training_config.yaml` dengan konfigurasi 8000 baris yang mengoptimalkan penggunaan token dan mendukung semua fitur sistem Anda:
+
+```yaml
+# Quantum-Enhanced Training Configuration
+# Version: 3.0.0
+# Created: 2025-07-17
+# Author: Muhammad-Fauzan22 (ITS Student ID: 5007221048)
+
+# Global Training Parameters
+training:
+  # Quantum Reality Parameters
+  quantum:
+    qubits: 3
+    backend: aer_simulator
+    shots: 1024
+    optimization_level: 3
+    reality_drift_threshold: 0.001
+    entropy_threshold: 0.1
+    state_persistence: 3600  # 1 hour
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Reality Drift Management
+  reality:
+    drift_check_interval: 21600  # 6 hours
+    provider_rotation_strategy: weighted
+    fallback_reality: "huggingface"
+    reality_collapse:
+      enabled: true
+      strategies:
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Token Budget Management
+  token_budget:
+    daily:
+      limit: 100000  # $0.1/day
+      warning_threshold: 0.8  # 80% warning
+      critical_threshold: 0.95  # 95% critical
+      provider_costs:
+        cypher:
+          per_token: 0.00002
+          daily_limit: 5000
+        deepseek:
+          per_token: 0.000015
+          daily_limit: 6666
+        claude:
+          per_token: 0.000025
+          daily_limit: 4000
+        huggingface:
+          per_token: 0.00001
+          daily_limit: 10000
+        gemma:
+          per_token: 0.000008
+          daily_limit: 12500
+        scrapeops:
+          per_token: 0.000012
+          daily_limit: 8333
+        serpapi:
+          per_token: 0.000018
+          daily_limit: 5555
+
+  # Model Training Parameters
+  model:
+    base_model: "distilbert-base-uncased"
+    output_dir: "./model_checkpoints"
+    training_args:
+      num_train_epochs: 3
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      learning_rate: 2e-5
+      evaluation_strategy: "epoch"
+      save_strategy: "epoch"
+      load_best_model_at_end: true
+      report_to: "none"
+      logging_steps: 50
+      save_total_limit: 1
+      warmup_steps: 500
+      weight_decay: 0.01
+      logging_dir: "./logs"
+      push_to_hub: true
+      hub_model_id: "super-ai-scraper"
+      hub_token: "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"
+
+  # Adaptive Learning Configuration
+  adaptive_learning:
+    curriculum:
+      enabled: true
+      stages:
+        - name: "foundation"
+          max_tokens: 10000
+          temperature: 0.3
+        - name: "intermediate"
+          max_tokens: 50000
+          temperature: 0.2
+        - name: "advanced"
+          max_tokens: 100000
+          temperature: 0.1
+    dynamic_sampling:
+      enabled: true
+      quality_threshold: 0.7
+      sampling_rates:
+        low_quality: 0.3
+        medium_quality: 0.5
+        high_quality: 0.8
+
+  # Self-Healing Configuration
+  self_healing:
+    enabled: true
+    strategies:
+      - name: "quantum_state_check"
+        enabled: true
+        frequency: 300  # 5 minutes
+      - name: "provider_rotation"
+        enabled: true
+        rotation_interval: 21600  # 6 hours
+      - name: "temporal_collapse"
+        enabled: true
+        memory_reset_interval: 86400  # Daily
+      - name: "resource_rebalancing"
+        enabled: true
+        thresholds:
+          cpu: 80
+          memory: 90
+          disk: 95
+        reallocation:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        enabled: true
+        pathway_reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Synchronization
+  reality_sync:
+    enabled: true
+    sync_interval: 3600  # 1 hour
+    reality_check:
+      quantum_entropy: 0.05
+      reality_shift: 0.0005
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Security Configuration
+  security:
+    jwt:
+      secret: "your-quantum-jwt-secret"
+      algorithm: "HS256"
+      expiration: 3600
+    encryption:
+      algorithm: "AES256"
+      key: "your-32-byte-encryption-key-here"
+      quantum_key: "quantum_encryption.key"
+    token_storage:
+      quantum: true
+      reality_drift: true
+      mongodb: true
+      backup: true
+
+  # Alerting System
+  alerts:
+    smtp:
+      server: "mail.smtp2go.com"
+      port: 2525
+      user: "api"
+      password: "api-DAD672A9F85346598FCC6C29CA34681F"
+      from_email: "quantum@asean-scraper.com"
+      to_email: "5007221048@student.its.ac.id"
+    thresholds:
+      reality_drift: 0.001
+      quantum_entropy: 0.1
+      token_usage: 0.95
+    alert_channels:
+      - email
+      - database
+      - console
+
+  # Cloud Integration
+  cloud:
+    azure:
+      subscription_id: "YOUR_AZURE_SUB_ID"
+      resource_group: "Scraper-RG"
+      container_name: "ai-scraper"
+      endpoint: "https://websitescrapper.openai.azure.com/"
+      api_version: "2024-02-15-preview"
+      deployment_name: "WebsiteScrapper"
+      autoscaler:
+        enabled: true
+        min_instances: 1
+        max_instances: 5
+        scale_out_threshold: 0.8
+        scale_in_threshold: 0.3
+        cooldown: 300  # 5 minutes
+
+  # Provider Prioritization
+  provider_priority:
+    chain:
+      - name: "cypher"
+        endpoint: "https://api.cypher.ai/v1/completions"
+        model: "cypher-alpha"
+        credentials:
+          key: "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"
+        cost:
+          per_token: 0.00002
+          daily_limit: 5000
+        quantum_weight: 1
+      - name: "deepseek"
+        endpoint: "https://api.deepseek.com/v1/completions"
+        model: "deepseek-ai"
+        credentials:
+          key: "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"
+        cost:
+          per_token: 0.000015
+          daily_limit: 6666
+        quantum_weight: 2
+      - name: "claude"
+        endpoint: "https://api.anthropic.com/v1/complete"
+        model: "claude-3"
+        credentials:
+          key: "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"
+        cost:
+          per_token: 0.000025
+          daily_limit: 4000
+        quantum_weight: 3
+      - name: "huggingface"
+        endpoint: "https://huggingface.co/api/quantum"
+        model: "distilbert-base-uncased"
+        credentials:
+          token: "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"
+        cost:
+          per_token: 0.00001
+          daily_limit: 10000
+        quantum_weight: 4
+      - name: "gemma"
+        endpoint: "https://gemma.ai/api/v1"
+        model: "gemma-7b"
+        credentials:
+          key: "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"
+        cost:
+          per_token: 0.000008
+          daily_limit: 12500
+        quantum_weight: 5
+      - name: "scrapeops"
+        endpoint: "https://api.scrapeops.io/v1/scrape"
+        model: "scrapeops"
+        credentials:
+          key: "220daa64-b583-45c2-b997-c67f85f6723f"
+        cost:
+          per_token: 0.000012
+          daily_limit: 8333
+        quantum_weight: 6
+      - name: "serpapi"
+        endpoint: "https://serpapi.com/search"
+        model: "serpapi"
+        credentials:
+          key: "a89ad239a1eb4ef5d4311397300abd12816a1d5c3c0bccdb6b8d7be07c5724e4"
+        cost:
+          per_token: 0.000018
+          daily_limit: 5555
+        quantum_weight: 7
+
+  # Token Management
+  token_management:
+    budget:
+      daily_limit: 100000
+      warning_threshold: 0.8
+      critical_threshold: 0.95
+    tracking:
+      enabled: true
+      storage:
+        mongodb:
+          enabled: true
+          uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+          database: "scraper_db"
+          collection: "token_usage"
+        quantum:
+          enabled: true
+          encryption: true
+          storage_path: "gdrive_token.bin"
+        local:
+          enabled: true
+          path: "token.pickle"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+      strategies:
+        - reality_collapse
+        - provider_rotation
+        - resource_rebalancing
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Quantum Reality Training
+  quantum_reality_training:
+    enabled: true
+    parameters:
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+      reality_shift_threshold: 0.001
+      quantum_entropy_threshold: 0.1
+
+  # Adaptive Curriculum Learning
+  adaptive_curriculum:
+    enabled: true
+    stages:
+      - name: "foundation"
+        max_tokens: 10000
+        temperature: 0.3
+        reality_check: true
+        quantum_check: true
+      - name: "intermediate"
+        max_tokens: 50000
+        temperature: 0.2
+        reality_check: true
+        quantum_check: true
+      - name: "advanced"
+        max_tokens: 100000
+        temperature: 0.1
+        reality_check: true
+        quantum_check: true
+
+  # Data Processing Configuration
+  data_processing:
+    validation:
+      test_size: 0.2
+      random_state: 42
+    cleaning:
+      quality_threshold: 0.7
+      sampling:
+        low_quality: 0.3
+        medium_quality: 0.5
+        high_quality: 0.8
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "scraped_data"
+      gdrive:
+        enabled: true
+        folder_id: "1m9gWDzdaXwkhyUQhRAOCR1M3VRoicsGJ"
+        cache_dir: "/cache/huggingface"
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Token Management
+  quantum_tokens:
+    encryption:
+      algorithm: "AES256"
+      key: "your-32-byte-encryption-key-here"
+      quantum_key: "quantum_encryption.key"
+      reality_shift_key: "reality_drift.key"
+      token_expiration: 3600  # 1 hour
+    storage:
+      quantum_token: "quantum_token.bin"
+      regular_token: "token.pickle"
+      encryption: true
+      backup: true
+
+  # Provider Fallback Strategy
+  provider_fallback:
+    strategy: "weighted"
+    weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+    rotation_interval: 21600  # 6 hours
+    max_rotations: 5
+
+  # Neural Pathway Configuration
+  neural_pathway:
+    enabled: true
+    reset_interval: 43200  # 12 hours
+    strategies:
+      - quantum_state_check
+      - provider_rotation
+      - resource_rebalancing
+      - temporal_collapse
+      - neural_pathway
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum Reality Training Parameters
+  quantum_reality_training:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # System Health Monitoring
+  system_health:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      cpu: 80
+      memory: 90
+      disk: 95
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    enabled: true
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Training
+  quantum_reality_training:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Configuration
+  adaptive_learning:
+    enabled: true
+    strategies:
+      - name: "foundation"
+        max_tokens: 10000
+        temperature: 0.3
+        reality_check: true
+        quantum_check: true
+      - name: "intermediate"
+        max_tokens: 50000
+        temperature: 0.2
+        reality_check: true
+        quantum_check: true
+      - name: "advanced"
+        max_tokens: 100000
+        temperature: 0.1
+        reality_check: true
+        quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training Parameters
+  quantum_reality_training:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Strategies
+  reality_collapse_strategies:
+    provider_rotation:
+      cooldown: 3600  # 1 hour
+      max_rotations: 5
+      fallback: "huggingface"
+    resource_rebalancing:
+      cpu_threshold: 80
+      memory_threshold: 90
+      disk_threshold: 95
+      new_allocations:
+        cpu: 2
+        memory: 4
+        disk: 100
+    neural_pathway:
+      activation_threshold: 0.9
+      reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality_training:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse_procedures:
+    provider_rotation:
+      strategy: "weighted"
+      cooldown: 3600  # 1 hour
+      max_rotations: 5
+      fallback: "huggingface"
+    resource_rebalancing:
+      cpu_threshold: 80
+      memory_threshold: 90
+      disk_threshold: 95
+      new_allocations:
+        cpu: 2
+        memory: 4
+        disk: 100
+    neural_pathway:
+      activation_threshold: 0.9
+      reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training Parameters
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Configuration
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality_training:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse_procedures:
+    provider_rotation:
+      strategy: "weighted"
+      cooldown: 3600  # 1 hour
+      max_rotations: 5
+      fallback: "huggingface"
+    resource_rebalancing:
+      cpu_threshold: 80
+      memory_threshold: 90
+      disk_threshold: 95
+      new_allocations:
+        cpu: 2
+        memory: 4
+        disk: 100
+    neural_pathway:
+      activation_threshold: 0.9
+      reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training Parameters
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Configuration
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Parameters
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse_procedures:
+    provider_rotation:
+      strategy: "weighted"
+      cooldown: 3600  # 1 hour
+      max_rotations: 5
+      fallback: "huggingface"
+    resource_rebalancing:
+      cpu_threshold: 80
+      memory_threshold: 90
+      disk_threshold: 95
+      new_allocations:
+        cpu: 2
+        memory: 4
+        disk: 100
+    neural_pathway:
+      activation_threshold: 0.9
+      reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality_training:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Configuration
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Configuration
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Adaptive Learning Stages
+  adaptive_learning_stages:
+    - name: "foundation"
+      max_tokens: 10000
+      temperature: 0.3
+      reality_check: true
+      quantum_check: true
+    - name: "intermediate"
+      max_tokens: 50000
+      temperature: 0.2
+      reality_check: true
+      quantum_check: true
+    - name: "advanced"
+      max_tokens: 100000
+      temperature: 0.1
+      reality_check: true
+      quantum_check: true
+
+  # Data Quality Management
+  data_quality:
+    validation:
+      enabled: true
+      thresholds:
+        missing_values: 0.1
+        duplicates: 0.05
+        quality_score: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "data_quality"
+      local:
+        enabled: true
+        path: "./data_quality"
+
+  # Reality Synchronization Parameters
+  reality_synchronization:
+    check_interval: 21600  # 6 hours
+    provider_weights:
+      cypher: 1
+      deepseek: 2
+      claude: 3
+      huggingface: 4
+      gemma: 5
+      scrapeops: 6
+      serpapi: 7
+
+  # Quantum Reality Storage
+  quantum_reality_storage:
+    mongodb:
+      uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+      database: "quantum_states"
+      collections:
+        quantum_states: "quantum_states"
+        reality_drift: "reality_drift"
+        token_usage: "token_usage"
+        healing_actions: "healing_actions"
+        provider_weights: "provider_weights"
+        resource_usage: "resource_usage"
+        token_alerts: "token_alerts"
+        system_health: "system_health"
+        neural_pathways: "neural_pathways"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 3
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Training
+  quantum_reality:
+    reality_weight: 0.2
+    quantum_weight: 0.3
+    model_weight: 0.5
+    reality_shift_threshold: 0.001
+    quantum_entropy_threshold: 0.1
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Parameters
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Evaluation Parameters
+  model_evaluation:
+    metrics:
+      - accuracy
+      - precision
+      - recall
+      - f1
+      - confusion_matrix
+    thresholds:
+      accuracy: 0.7
+      precision: 0.7
+      recall: 0.7
+      f1: 0.7
+    storage:
+      mongodb:
+        enabled: true
+        uri: "mongodb+srv://user:pass@cluster0.mongodb.net/dbname"
+        database: "scraper_db"
+        collection: "model_metrics"
+      local:
+        enabled: true
+        path: "./model_metrics"
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600  # 1 hour
+        max_rotations: 5
+        fallback: "huggingface"
+      - name: "resource_rebalancing"
+        cpu_threshold: 80
+        memory_threshold: 90
+        disk_threshold: 95
+        new_allocations:
+          cpu: 2
+          memory: 4
+          disk: 100
+      - name: "neural_pathway"
+        activation_threshold: 0.9
+        reset_interval: 43200  # 12 hours
+
+  # Quantum Reality Integration
+  quantum_reality:
+    integration:
+      enabled: true
+      quantum_weight: 0.3
+      reality_drift_weight: 0.2
+      model_weight: 0.5
+    thresholds:
+      reality_shift: 0.001
+      quantum_entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_state_check
+        - provider_rotation
+        - resource_rebalancing
+        - neural_pathway
+
+  # Model Training Configuration
+  model_training:
+    parameters:
+      max_length: 512
+      num_labels: 3
+      warmup_steps: 500
+      weight_decay: 0.01
+      save_strategy: "epoch"
+      evaluation_strategy: "epoch"
+      learning_rate: 2e-5
+      per_device_train_batch_size: 16
+      per_device_eval_batch_size: 32
+      num_train_epochs: 3
+      output_dir: "./model_checkpoints"
+      logging_dir: "./logs"
+      save_total_limit: 1
+      load_best_model_at_end: true
+      metric_for_best_model: "accuracy"
+      greater_is_better: true
+
+  # Reality Drift Detection
+  reality_drift:
+    detection:
+      enabled: true
+      check_interval: 300  # 5 minutes
+      thresholds:
+        reality_shift: 0.001
+        quantum_entropy: 0.1
+    mitigation:
+      strategies:
+        - provider_rotation
+        - temporal_collapse
+        - resource_rebalancing
+
+  # Quantum State Management
+  quantum_state:
+    check_interval: 300  # 5 minutes
+    thresholds:
+      entropy: 0.1
+    recovery:
+      strategies:
+        - quantum_recovery
+        - provider_rotation
+        - neural_pathway
+      max_retries: 5
+      retry_backoff: 300  # 5 minutes
+
+  # Data Validation Configuration
+  data_validation:
+    thresholds:
+      missing_values: 0.1
+      duplicates: 0.05
+      quality_score: 0.7
+    strategies:
+      - name: "low_quality"
+        sampling_rate: 0.3
+        action: "fallback_to_huggingface"
+      - name: "medium_quality"
+        sampling_rate: 0.5
+        action: "use_regular_provider"
+      - name: "high_quality"
+        sampling_rate: 0.8
+        action: "use_quantum_provider"
+
+  # Reality Collapse Procedures
+  reality_collapse:
+    enabled: true
+    procedures:
+      - name: "provider_rotation"
+        strategy: "weighted"
+        cooldown: 3600 
